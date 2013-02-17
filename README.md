@@ -9,7 +9,6 @@ all the tools and infrastructure that is needed in order for him to build automa
 
 <b><h3>The Mobile-Automation framework is comprised of the following components:</h3></b>
 
-- AdbController - exposes interfaces for the adb provided by Google , via USB or WIFI connection
 - Mobile-Client - this will be the main interface that will exposed for the user in order for him to write tests
 - tcpServer - an apk that executes the commands made by the client on the AUT (application under test)
 
