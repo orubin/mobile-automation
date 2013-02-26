@@ -9,8 +9,6 @@
 [Tt]humbs.db
 
 #Eclipse files
-.project
-.classpath
 .settings
 
 #Java and Maven
@@ -21,9 +19,3 @@ target
 /bin
 /gen
 
-#JSystem files
-jsystem.properties
-jsystem.properties.bu
-runnerState.properties
-log
-myFile.txt

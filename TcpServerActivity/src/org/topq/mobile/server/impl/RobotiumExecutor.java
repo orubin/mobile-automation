@@ -50,7 +50,6 @@ public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
 	};
 	
 	private IDataCallback.Stub executorListener = new IDataCallback.Stub() {
-		@Override
 		public String dataReceived(String data) throws RemoteException {
 			String result = null;
 			try {

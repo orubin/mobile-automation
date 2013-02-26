@@ -189,7 +189,6 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
     	Log.i(TAG, "Done parsing configurations");   	
     }
 
-	@Override
 	public IBinder asBinder() {
 		// NOT USED
 		return null;
