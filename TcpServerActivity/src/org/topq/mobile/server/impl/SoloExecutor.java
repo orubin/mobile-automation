@@ -107,9 +107,6 @@ public class SoloExecutor {
 			else if (commandStr.equals("createFileInServer")) {
 				response = createFileInServer(request.getParams());
 			} 
-			else if (commandStr.equals("pull")) {
-				response = pull(request.getParams());
-			} 
 			else if (commandStr.equals("closeActivity")) {
 				response = closeActivity();
 			} 
@@ -210,33 +207,6 @@ public class SoloExecutor {
 			 * "."+arguments[i],android.content.Intent.EXTRA_TEXT, arguments[i+1]); }
 			 * solo.getCurrentActivity().startActivity(sendIntent); }
 			 */
-		} 
-		catch (Exception e) {
-			result = handleException(command, e);
-		}
-		return result;
-	}
-
-	private CommandResponse pull(String[] arguments) {
-		String command = "the command  pull";
-		String allText = "";
-		CommandResponse result = new CommandResponse();
-		DataInputStream in = null;
-		FileInputStream fstream = null;
-		try {
-			command += "(" + arguments[0] + ")";
-			fstream = new FileInputStream(arguments[0]);
-			// Get the object of DataInputStream
-			in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String line;
-			while ((line = br.readLine()) != null) {
-				allText += line;
-			}
-			result.setResponse(allText);
-			result.setSucceeded(true);
-			in.close();
-			fstream.close();
 		} 
 		catch (Exception e) {
 			result = handleException(command, e);

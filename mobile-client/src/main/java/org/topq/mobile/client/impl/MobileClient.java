@@ -155,16 +155,6 @@ public class MobileClient implements MobileClientInterface {
 		return sendData("clickOnHardware", button.name());
 	}
 
-	public byte[] pull(String fileName) throws Exception {
-		CommandResponse response = sendDataAndGetJSonObj(new CommandRequest("pull", fileName));
-		logger.info("command pull receved" + JsonParser.toJson(response));
-		return ((response.getResponse())).getBytes("UTF-16LE");
-	}
-
-	public String push(byte[] data, String newlocalFileName) throws Exception {
-		return sendData("createFileInServer", newlocalFileName, Base64.encodeBytes(data, Base64.URL_SAFE), "true");
-	}
-
 	public void closeConnection() throws Exception {
 		sendData("exit");
 	}

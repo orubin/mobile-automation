@@ -48,10 +48,4 @@ public interface MobileClientInterface {
 	
 	public void closeConnection() throws Exception;
 
-	public byte[] pull(String fileName) throws Exception;
-	
-	public String push(byte[] data,String newlocalFileName) throws Exception;
-	
-	
-	
 }
