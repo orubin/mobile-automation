@@ -3,6 +3,14 @@ package org.topq.mobile.client.test;
 import org.topq.mobile.client.impl.MobileClient;
 import org.topq.mobile.client.interfaces.MobileClientInterface;
 
+/**
+ * 
+ * @author tal ben shabtay
+ * this class is the main test class
+ * which includes a single main method that shows the usage
+ * of the mobile client interface.
+ *
+ */
 public class Main {
 	
 	public static void main(String [ ] args) {

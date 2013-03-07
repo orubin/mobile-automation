@@ -4,18 +4,29 @@ import org.topq.mobile.common.client.enums.HardwareButtons;
 
 /**
  * 
- * @author Bortman Limor
+ * @author Bortman Limor,Tal ben shabtay
+ * this interface is the API that will be exposed to the clients.
+ * the features in this API has the ability to operate functions
+ * upon an android application
  *
  */
 public interface MobileClientInterface {
 	
-	public static final String RESULT_STRING = "RESULT";
-	public static final String ERROR_STRING = "ERROR";
-	public static final String SUCCESS_STRING = "SUCCESS";
-	public static final String NO_DATA_STRING = "NO_DATA_FROM_SERVER";
-	
+	/**
+	 * NOTE ! THIS METHOD MUST BE THE FIRST COMMAND BEFORE ANY OTHER COMMAND
+	 * the launch method will launch the instrumentation of the application
+	 * @param launcherActivityClass the full class name with the package of the main launcher activity
+	 * @return return status of the operation
+	 * @throws Exception
+	 */
 	public String launch(String launcherActivityClass) throws Exception;
 	
+	/**
+	 * 
+	 * @param index
+	 * @return
+	 * @throws Exception
+	 */
 	public String getTextView(int index) throws Exception ;
 	
 	public String getTextViewIndex(String text) throws Exception;
