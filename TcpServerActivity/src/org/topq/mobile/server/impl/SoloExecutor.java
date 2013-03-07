@@ -1,11 +1,7 @@
 package org.topq.mobile.server.impl;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +22,11 @@ import android.widget.TextView;
 
 import com.jayway.android.robotium.solo.Solo;
 
+/**
+ * 
+ * @author tal ben shabtay,limor bortman
+ * executes the client command with the solo interface
+ */
 public class SoloExecutor {
 
 	private static final String TAG = "SoloExecutor";
@@ -33,12 +34,23 @@ public class SoloExecutor {
 	private Solo solo;
 	private final ISoloProvider soloProvider;
 
+	/**
+	 * creates a solo executor
+	 * @param soloProvider an interface that provides a solo object
+	 * @param instrumentation the instrumentation of the AUT
+	 */
 	public SoloExecutor(final ISoloProvider soloProvider, Instrumentation instrumentation) {
 		super();
 		this.soloProvider = soloProvider;
 		this.instrumentation = instrumentation;
 	}
 
+	/**
+	 * executes the command with the solo
+	 * @param data json of command request object
+	 * @return json of a command response object
+	 * @throws Exception
+	 */
 	public String execute(final String data) throws Exception {
 //		ScriptParser parser;
 //		JSONObject result = new JSONObject();
@@ -122,6 +134,11 @@ public class SoloExecutor {
 
 	}
 
+	/**
+	 * checks if the view is visible with the input id
+	 * @param arguments id of the view
+	 * @return response with the status of the command
+	 */
 	private CommandResponse isViewVisibleByViewId(String[] arguments) {
 		CommandResponse result = new CommandResponse();
 		String command = "the command isViewVisible";
@@ -152,6 +169,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * checks if the view is visible with the input view name
+	 * @param arguments view name
+	 * @return response with the status of the command
+	 */
 	private CommandResponse isViewVisibleByViewName(String[] arguments) {
 		CommandResponse result = new CommandResponse();
 		String command = "the command isViewVisible";
@@ -175,6 +197,7 @@ public class SoloExecutor {
 		return result;
 	}
 
+	
 	private CommandResponse activateIntent(String[] arguments) {
 		String command = null;
 		CommandResponse result = new CommandResponse();
@@ -242,6 +265,10 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * gets the text of all the current text views
+	 * @return response with the status of the command
+	 */
 	private CommandResponse getCurrentTextViews(String[] arguments) {
 		String command = "the command  getCurrentTextViews";
 		CommandResponse result = new CommandResponse();
@@ -261,6 +288,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * will get the text view with the input index
+	 * @param arguments index of the text view
+	 * @return command response with the text of the input text view index
+	 */
 	private CommandResponse getTextView(String[] arguments) {
 		String command = "the command  getTextView";
 		CommandResponse result = new CommandResponse();
@@ -277,6 +309,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * gets the text of the view by the input index
+	 * @param arguments the index of the view
+	 * @return response with the status of the command
+	 */
 	private CommandResponse getTextViewIndex(String[] arguments) {
 		String command = "the command  getTextViewIndex";
 		CommandResponse result = new CommandResponse();
@@ -298,6 +335,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * gets the text by index
+	 * @param arguments index
+	 * @return response with the status of the command
+	 */
 	private CommandResponse getText(String[] arguments) {
 		String command = "the command  getText";
 		CommandResponse result = new CommandResponse();
@@ -314,6 +356,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * clicks on a menu item
+	 * @param arguments the item to click on
+	 * @return response with the status of the command
+	 */
 	private CommandResponse clickOnMenuItem(String[] arguments) {
 		String command = "the command  clickOnMenuItem";
 		CommandResponse result = new CommandResponse();
@@ -329,6 +376,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * sends a single character key click
+	 * @param arguments the char to click on 
+	 * @return response with the status of the command
+	 */
 	private CommandResponse sendKey(String[] arguments) {
 		String command = "the command  sendKey";
 		CommandResponse result = new CommandResponse();
@@ -344,6 +396,12 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * clicks in the input control on the input index
+	 * @param commandParameters [0] the control id , [1] the index of the item to click
+	 * @return response with the status of the command
+	 * @throws Exception
+	 */
 	private CommandResponse clickInControlByIndex(String[] commandParameters) throws Exception {
 		String command = "The command clickInControlByIndex";
 		CommandResponse result = new CommandResponse();
@@ -379,10 +437,9 @@ public class SoloExecutor {
 	/**
 	 * This method will search the requested view / control by its name in the currentViews <br>
 	 * 
-	 * @param viewName
-	 * @return View<br>
+	 * @param viewName the name of the view
+	 * @return response with the status of the command
 	 * @throws Exception
-	 *             in case view was not found<br>
 	 */
 	private View findViewByName(String viewName) throws Exception {
 		ArrayList<View> currentViews = this.solo.getCurrentViews();
@@ -395,15 +452,10 @@ public class SoloExecutor {
 	}
 
 	/**
-	 * This method is expecting viewId as argument in jsonArray<br>
-	 * I am not sure how this can be known in advance<Br>
-	 * There is no method that retrieves the viewId back to client<br>
-	 * I think it is best to use the view name and find by method written<br>
-	 * Will change soon.
+	 * click on the view id
 	 * 
-	 * @param arguments
-	 *            expecting viewId in arg in index 0;<br>
-	 * @return
+	 * @param arguments id of the view to click
+	 * @return response with the status of the command
 	 */
 	private CommandResponse clickOnView(String[] arguments) {
 		String command = "the command  clickOnView";
@@ -421,6 +473,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * click on button with the input text
+	 * @param arguments the text of the button to click
+	 * @return response with the status of the command
+	 */
 	private CommandResponse clickOnButtonWithText(String[] arguments) {
 		String command = "the command  clickOnButton";
 		CommandResponse result = new CommandResponse();
@@ -436,6 +493,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * clears the text box
+	 * @param arguments the id of the text box to clear
+	 * @return response with the status of the command
+	 */
 	private CommandResponse clearEditText(String[] arguments) {
 		String command = "the command  clearEditText";
 		CommandResponse result = new CommandResponse();
@@ -451,6 +513,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * checks if button is visible
+	 * @param arguments [0] search button by id or text, [1] the text or id to search the button
+	 * @return response with the status of the command
+	 */
 	private CommandResponse isButtonVisible(String[] arguments) {
 		String command = "the command isButtonVisible ";
 		CommandResponse result = new CommandResponse();
@@ -483,6 +550,12 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * checks if the button with input text is visble
+	 * @param buttonText the text of the button
+	 * @return response with the status of the command
+	 * @throws Exception
+	 */
 	private boolean isButtonVisibleByText(String buttonText) throws Exception {
 		Button button = this.solo.getButton(buttonText);
 		if (button != null) {
@@ -493,6 +566,12 @@ public class SoloExecutor {
 		}
 	}
 
+	/**
+	 * checks if the button with input id is visible
+	 * @param buttonId the id of the button
+	 * @return response with the status of the command
+	 * @throws Exception
+	 */
 	private boolean isButtonVisibleById(int buttonId) throws Exception {
 		ArrayList<Button> currentButtons = this.solo.getCurrentButtons();
 		for (Button button : currentButtons) {
@@ -505,6 +584,11 @@ public class SoloExecutor {
 		return false;
 	}
 
+	/**
+	 * click on the an item in list with the input index
+	 * @param arguments index of the item in the list
+	 * @return response with the status of the command
+	 */
 	private CommandResponse clickInList(String[] arguments) {
 		String command = "the command  clickInList(";
 		CommandResponse result = new CommandResponse();
@@ -520,6 +604,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * click on button with the input id
+	 * @param params the id of the button
+	 * @return response with the status of the command
+	 */
 	private CommandResponse clickOnButton(String[] params) {
 		String command = "the command  clickOnButton";
 		CommandResponse result = new CommandResponse();
@@ -535,6 +624,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * enter text to the input text box id with the input text
+	 * @param params [0] the id of the text box , [1] the text to enter
+	 * @return response with the status of the command
+	 */
 	private CommandResponse enterText(String[] params) {
 		String command = "the command  enterText";
 		CommandResponse result = new CommandResponse();
@@ -551,6 +645,11 @@ public class SoloExecutor {
 
 	}
 
+	/**
+	 * click on the input text
+	 * @param params the text to click on
+	 * @return response with the status of the command
+	 */
 	private CommandResponse clickOnText(String[] params) {
 		String command = "the command clickOnText";
 		CommandResponse result = new CommandResponse();
@@ -567,6 +666,11 @@ public class SoloExecutor {
 
 	}
 
+	/**
+	 * click on hardware button
+	 * @param keyString an hardware button to click
+	 * @return response with the status of the command
+	 */
 	private CommandResponse clickOnHardware(String[] keyString) {
 		String command = "the command clickOnHardware";
 		CommandResponse result = new CommandResponse();
@@ -583,6 +687,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * NOTE ! THIS METHOD MUST BE THE FIRST COMMAND BEFORE ANY OTHER COMMAND
+	 * the launch method will launch the instrumentation of the application
+	 * @return return status of the operation
+	 */
 	private CommandResponse launch() {
 		Log.i(TAG, "Robotium: About to launch application");
 		CommandResponse result = new CommandResponse();
@@ -598,6 +707,10 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * closes the activity
+	 * @return response with the status of the command
+	 */
 	private CommandResponse closeActivity() {
 		Log.i(TAG, "Robotium: About to close application");
 		CommandResponse result = new CommandResponse();
@@ -611,6 +724,12 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * handle an exception
+	 * @param command the command that caused the exception
+	 * @param e the exception that was thrown
+	 * @return response with the status of the command
+	 */
 	private CommandResponse handleException(final String command,Throwable e) {
 		CommandResponse result = new CommandResponse();
 		result.setResponse(command+" failed due to " + e.getMessage());
@@ -618,6 +737,11 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * clicks on a view
+	 * @param view the view to click
+	 * @throws Exception
+	 */
 	private void clickOnView(View view) throws Exception {
 		if (view.isShown()) {
 			this.solo.clickOnView(view);

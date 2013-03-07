@@ -1,8 +1,13 @@
 package org.topq.mobile.common.server.consts;
 
+/**
+ * 
+ * @author tal ben shabtay
+ * default consts of the server properties
+ */
 public abstract class TcpConsts {
 	
-	public static String SERVER_DEFAULT_HOSTNAME = "localhost";
-	public static int SERVER_DEFAULT_PORT = 4321;
+	public final static String SERVER_DEFAULT_HOSTNAME = "localhost";
+	public final static int SERVER_DEFAULT_PORT = 4321;
 
 }

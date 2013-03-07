@@ -15,6 +15,11 @@ import org.topq.mobile.server.interfaces.IDataCallback;
 
 import android.util.Log;
 
+/**
+ * 
+ * @author tal ben shabtay,limor bortman
+ * a tcp server that can launch the registered instrumentation laucnher upon command
+ */
 public class TcpServer implements Runnable {
 
 	private static String TAG;
@@ -25,6 +30,10 @@ public class TcpServer implements Runnable {
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
 	
+	/**
+	 * default ctor
+	 * @param listenerPort server port
+	 */
 	private TcpServer(int listenerPort) {
 		this.listenerPort = listenerPort;
 		this.instrumentationLauncher = null;
@@ -32,6 +41,10 @@ public class TcpServer implements Runnable {
 		TcpServer.TAG = "TcpServer("+this.listenerPort+")";
 	}
 
+	/**
+	 * sets the server to a new port and restarting the server
+	 * @param newPort the new server port
+	 */
 	public void setNewPort(int newPort) {
 		this.listenerPort = newPort;
 		TcpServer.TAG = "TcpServer("+this.listenerPort+")";
@@ -44,10 +57,18 @@ public class TcpServer implements Runnable {
 		this.startServerCommunication();
 	}
 	
+	/**
+	 * gets an instance of the tcp server with the provided port
+	 * @param listenerPort the port of the server
+	 * @return instance of the server
+	 */
 	public static TcpServer getInstance(int listenerPort) {
 		return new TcpServer(listenerPort);
 	}
 	
+	/**
+	 * start the server thread communication listening
+	 */
 	public void startServerCommunication() {
 		Thread serverThread = new Thread(this);
 		Log.i(TAG,"About to launch server");
@@ -56,21 +77,36 @@ public class TcpServer implements Runnable {
 		Log.i(TAG,"Server has start");
 	}
 	
+	/**
+	 * stop the server thread
+	 */
 	public void stopServerCommunication() {
 		Log.i(TAG,"About to stop server");
 			this.serverLiving = false;
 	}
 	
+	/**
+	 * registers the instrumentation launcher
+	 * @param instruLauncher
+	 */
 	public void registerInstrumentationLauncher(IIntsrumentationLauncher instruLauncher) {
 		Log.d(TAG, "Registering instrumenation launcher : "+instruLauncher);
 		this.instrumentationLauncher = instruLauncher;
 	}
 	
+	/**
+	 * register a data executor
+	 * @param dataExecutor
+	 */
 	public void registerDataExecutor(IDataCallback dataExecutor) {
 		Log.d(TAG, "Registering data launcher : "+dataExecutor);
 		this.dataExecutor = dataExecutor;
 	}
 	
+	/**
+	 * the server thread main method that listens to connections
+	 * and transfers data to the data executor
+	 */
 	public void run() {
 		this.serverSocket = null;
 		this.clientSocket = null;

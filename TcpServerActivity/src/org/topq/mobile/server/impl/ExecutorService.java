@@ -9,6 +9,12 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
+/**
+ * this service is in charge of capturing data from the tcp server 
+ * and transferring it to the command executor
+ * @author tal ben shabtay
+ *
+ */
 public class ExecutorService extends Service {
 	
 	private static final String TAG = "ExecutorService";
@@ -16,6 +22,10 @@ public class ExecutorService extends Service {
 	
 	private IExecutorService.Stub apiEndPoint = new IExecutorService.Stub() {
 		
+		/**
+		 * implements the service execute command - 
+		 * sends the received data to the command executor
+		 */
 		public String executeCommand(String data) {
 			Log.d(TAG, "Recieved : "+data);
 			try {
@@ -27,6 +37,9 @@ public class ExecutorService extends Service {
 			return null;
 		}
 		
+		/**
+		 * registers a commamd executor to the service
+		 */
 		@Override
 		public void registerExecutor(IDataCallback executor) {
 			Log.d(TAG,"Registering Executor : "+executor);
@@ -35,6 +48,9 @@ public class ExecutorService extends Service {
 		
 	};
 	
+	/**
+	 * returns a stub of this service
+	 */
 	@Override
 	public IBinder onBind(Intent intent) {
 		if (ExecutorService.class.getName().equals(intent.getAction())) {
@@ -46,6 +62,9 @@ public class ExecutorService extends Service {
 		}
 	}
 
+	/**
+	 * create the service
+	 */
 	@Override
 	public void onCreate() {		
 		super.onCreate();

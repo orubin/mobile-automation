@@ -16,10 +16,13 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
+
+
 /**
  * 
- * @author Bortman Limor
- *
+ * @author Bortman Limor , Tal ben shabtay
+ * the class is the robotium executor
+ * it will get commands from the service and executes them
  */
 public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
 	
@@ -31,6 +34,10 @@ public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
 	private IExecutorService serviceApi;
 	
 	private ServiceConnection serviceConnection = new ServiceConnection() {
+		
+		/**
+		 *	creates a connection to the service and instantiate the service api  
+		 */
 		  @Override
 		  public void onServiceConnected(ComponentName name, IBinder service) {
 		    Log.i(TAG, "Service connection established");
@@ -43,13 +50,21 @@ public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
 			}
 		  }
 		 
+		  /**
+		   * kills the connection to the service
+		   */
 		  @Override
 		  public void onServiceDisconnected(ComponentName name) {
-		    Log.i(TAG, "Service connection closed");      
+		    Log.i(TAG, "Service connection closed");  
+		    serviceApi = null;
 		  }
 	};
 	
 	private IDataCallback.Stub executorListener = new IDataCallback.Stub() {
+		/**
+		 * implements the data received from the service and executes this data 
+		 * with the registered service executor
+		 */
 		public String dataReceived(String data) throws RemoteException {
 			String result = null;
 			try {
@@ -63,6 +78,9 @@ public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
 		}
 	};
 	
+	/**
+	 * sets the main launcher activity class and starts the instrumentation
+	 */
 	@Override	
 	public void onCreate(Bundle arguments) {	
 		Log.d(TAG, "Creating Instrumentation");	
@@ -94,7 +112,10 @@ public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
 	void prepareLooper() {  
 		Looper.prepare(); 
 	}
-		
+	
+	/**
+	 * provides a solo from the instrumentation
+	 */
 	@Override	
 	public Solo getSolo() {	
 		if(this.myActive == null) {
@@ -111,7 +132,11 @@ public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
 		}
 		return this.solo;
 	}
-		
+	
+	/**
+	 * provides a solo executor
+	 * @return solo executor
+	 */
 	public SoloExecutor getExecutor(){	
 		if(this.executor == null) {			
 			this.executor = new SoloExecutor(this, this);

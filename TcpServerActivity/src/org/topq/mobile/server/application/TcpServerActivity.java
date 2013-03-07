@@ -35,6 +35,11 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
+/**
+ * 
+ * @author tal ben shabtay
+ * the main activity of the tcp server application
+ */
 public class TcpServerActivity extends Activity implements IIntsrumentationLauncher,IDataCallback {
 	private static final String TAG = "TcpServerActivity";
 	private TcpServer serverThread;
@@ -42,21 +47,28 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	private boolean firstLaunch = true;
 	private IExecutorService serviceApi;
 	private ServiceConnection serviceConnection = new ServiceConnection() {
+		/**
+		 * set the interface for the service
+		 */
 		  @Override
 		  public void onServiceConnected(ComponentName name, IBinder service) {
 		    Log.i(TAG, "Service connection established");
 		    serviceApi = IExecutorService.Stub.asInterface(service);   
 		  }
 		 
+		  /**
+		   * destroys the interface to the service
+		   */
 		  @Override
 		  public void onServiceDisconnected(ComponentName name) {
-		    Log.i(TAG, "Service connection closed");      
+		    Log.i(TAG, "Service connection closed");     
+		    serviceApi = null;
 		  }
 	};
 	
 	/**
      * Get IP address from first non-localhost interface
-     * @return  address or empty string
+     * @return  first ipv4 external ip address or localhost string
      */
     private String getIPAddress() {
         try {
@@ -79,6 +91,9 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
         return "localhost";
     }
     
+    /**
+     * will update the server details on the screen
+     */
     private void setServerDetailsText() {
     	TextView serverDetails = (TextView)findViewById(R.id.server_details);
 	    Resources res = getResources();
@@ -87,7 +102,10 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	    serverDetails.setText(text);
 	    serverDetails.refreshDrawableState();
     }
-		 
+		
+    /**
+     * creates the service connection and starts the tcp server communication
+     */
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +127,9 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
         }
     }
 	
+	/**
+	 * updates the screen by the selected menu item
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
@@ -123,6 +144,9 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	    return result;
 	}
 	
+	/**
+	 * will display the new port dialogue and restart the server with the new port
+	 */
 	private void setNewServerPort() {
 		final EditText input = new EditText(this);
 		new AlertDialog.Builder(this)
@@ -130,6 +154,9 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	    .setMessage("Set new server port :")
 	    .setView(input)
 	    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+	    	/**
+	    	 * Ok button : restarts the server with the input server port
+	    	 */
 	        public void onClick(DialogInterface dialog, int whichButton) {
 	            Editable value = input.getText();
 	            try {
@@ -142,12 +169,18 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	            }      
 	        }
 	    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	    	/**
+	    	 * Cancel button : does nothing
+	    	 */
 	        public void onClick(DialogInterface dialog, int whichButton) {
 	            // Do nothing.
 	        }
 	    }).show();
 	}
 
+	/**
+	 * receives information from the server and execute the service
+	 */
 	@Override
 	public String dataReceived(String data) {
 		String result = null;
@@ -161,6 +194,9 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 		return result;
 	}
 
+	/**
+	 * will start the instrumentation server
+	 */
 	public void startInstrrumentationServer(String launcherActivityClass) {
 		Log.i(TAG, "Launching instrumentation for : "+launcherActivityClass);
 		Bundle savedInstanceState  = new Bundle();
@@ -169,12 +205,19 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 		Log.i(TAG, "Finished instrumentation launch");
 	}
 
+	/**
+	 * displays the menu
+	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_tcp_server, menu);
         return true;
     }
     
+    /**
+     * reads the configuration from the intent parameters and set the server with
+     * the properties
+     */
     private void readConfiguration() {
     	Log.i(TAG, "Reading user configurations");
     	String tmpVal = getIntent().getStringExtra(ClientProperties.SERVER_PORT.name());
@@ -189,6 +232,9 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
     	Log.i(TAG, "Done parsing configurations");   	
     }
 
+    /**
+     * NOT USED , NEEDED FOR SERVICE CONNECITON
+     */
 	public IBinder asBinder() {
 		// NOT USED
 		return null;

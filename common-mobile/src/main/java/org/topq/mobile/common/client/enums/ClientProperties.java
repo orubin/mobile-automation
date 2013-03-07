@@ -1,5 +1,10 @@
 package org.topq.mobile.common.client.enums;
 
+/**
+ * 
+ * @author tal ben shabtay
+ * the properties that client can send to the server
+ */
 public enum ClientProperties {
 	CLIENT_PORT,
 	SERVER_PORT,
