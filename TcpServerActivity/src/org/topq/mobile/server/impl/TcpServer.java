@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.topq.mobile.common.datamodel.CommandRequest;
 import org.topq.mobile.common.server.utils.JsonParser;
-import org.topq.mobile.server.interfaces.IIntsrumentationLauncher;
+import org.topq.mobile.server.interfaces.IInstrumentationLauncher;
 import org.topq.mobile.server.interfaces.IDataCallback;
 
 import android.util.Log;
@@ -25,7 +25,7 @@ public class TcpServer implements Runnable {
 	private static String TAG;
 	private int listenerPort;
 	private boolean serverLiving = true;
-	private IIntsrumentationLauncher instrumentationLauncher;
+	private IInstrumentationLauncher instrumentationLauncher;
 	private IDataCallback dataExecutor;
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
@@ -89,7 +89,7 @@ public class TcpServer implements Runnable {
 	 * registers the instrumentation launcher
 	 * @param instruLauncher
 	 */
-	public void registerInstrumentationLauncher(IIntsrumentationLauncher instruLauncher) {
+	public void registerInstrumentationLauncher(IInstrumentationLauncher instruLauncher) {
 		Log.d(TAG, "Registering instrumenation launcher : "+instruLauncher);
 		this.instrumentationLauncher = instruLauncher;
 	}
@@ -128,7 +128,7 @@ public class TcpServer implements Runnable {
 //						for (CommandParser command : parser.getCommands()) {
 							if(request.getCommand().equals("launch") && this.instrumentationLauncher != null){
 								Log.d(TAG, "Recieved launch command");
-								this.instrumentationLauncher.startInstrrumentationServer(request.getParams()[0]);
+								this.instrumentationLauncher.startInstrumentationServer(request.getParams()[0]);
 								Thread.sleep(TimeUnit.SECONDS.toMillis(5));
 							}
 //						}

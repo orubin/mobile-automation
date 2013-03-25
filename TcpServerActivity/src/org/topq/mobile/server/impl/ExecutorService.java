@@ -2,9 +2,11 @@ package org.topq.mobile.server.impl;
 
 import org.topq.mobile.server.interfaces.IExecutorService;
 import org.topq.mobile.server.interfaces.IDataCallback;
+import org.topq.mobile.server.interfaces.IInstrumentationLauncher;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -19,31 +21,45 @@ public class ExecutorService extends Service {
 	
 	private static final String TAG = "ExecutorService";
 	private IDataCallback commandExecutor;
+	private IInstrumentationLauncher instrumentationLauncher;
+	private TcpServer tcpServer;
 	
-	private IExecutorService.Stub apiEndPoint = new IExecutorService.Stub() {
+	private IExecutorService.Stub apiEndPoint = new IExecutorService.Stub() {		
 		
 		/**
-		 * implements the service execute command - 
-		 * sends the received data to the command executor
-		 */
-		public String executeCommand(String data) {
-			Log.d(TAG, "Recieved : "+data);
-			try {
-				return commandExecutor.dataReceived(data);
-			} 
-			catch (RemoteException e) {
-				Log.e(TAG,"Error in command execution",e);
-			}
-			return null;
-		}
-		
-		/**
-		 * registers a commamd executor to the service
+		 * registers a command executor to the service
 		 */
 		@Override
 		public void registerExecutor(IDataCallback executor) {
 			Log.d(TAG,"Registering Executor : "+executor);
 			commandExecutor = executor;
+			tcpServer.registerDataExecutor(commandExecutor);
+		}
+		
+		/**
+		 * registers an instrumentation launcher to the service
+		 */
+		@Override
+		public void registerInstrumenationLauncher(IInstrumentationLauncher iInstrumentationLauncher) {
+			Log.d(TAG,"Registering Instrumentation Launcher : "+iInstrumentationLauncher);
+			instrumentationLauncher = iInstrumentationLauncher;
+			tcpServer.registerInstrumentationLauncher(instrumentationLauncher);
+		}
+		
+		/**
+		 * starts the tcp server communication with the input port
+		 * @param serverPort the server port
+		 */
+		@Override
+		public void startServerCommunication(int serverPort) {
+			if (tcpServer == null) {
+				tcpServer = TcpServer.getInstance(serverPort);
+				
+				tcpServer.startServerCommunication();
+			}
+			else {
+				tcpServer.setNewPort(serverPort);
+			}
 		}
 		
 	};

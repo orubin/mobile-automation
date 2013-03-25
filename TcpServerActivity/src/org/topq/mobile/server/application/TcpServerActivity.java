@@ -16,7 +16,7 @@ import org.topq.mobile.server.interfaces.IDataCallback;
 import org.topq.mobile.server.application.R;
 import org.topq.mobile.server.impl.ExecutorService;
 import org.topq.mobile.server.impl.TcpServer;
-import org.topq.mobile.server.interfaces.IIntsrumentationLauncher;
+import org.topq.mobile.server.interfaces.IInstrumentationLauncher;
 
 import android.os.Bundle;
 import android.os.IBinder;
@@ -40,9 +40,8 @@ import android.widget.TextView;
  * @author tal ben shabtay
  * the main activity of the tcp server application
  */
-public class TcpServerActivity extends Activity implements IIntsrumentationLauncher,IDataCallback {
+public class TcpServerActivity extends Activity {
 	private static final String TAG = "TcpServerActivity";
-	private TcpServer serverThread;
 	private int serverPort;
 	private boolean firstLaunch = true;
 	private IExecutorService serviceApi;
@@ -53,7 +52,16 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 		  @Override
 		  public void onServiceConnected(ComponentName name, IBinder service) {
 		    Log.i(TAG, "Service connection established");
-		    serviceApi = IExecutorService.Stub.asInterface(service);   
+		    serviceApi = IExecutorService.Stub.asInterface(service);
+		    try {
+		    	serviceApi.startServerCommunication(serverPort);
+		    	serviceApi.registerInstrumenationLauncher(instrumentationLauncherListener);
+//				serviceApi.registerInstrumenationLauncher(TcpServerActivity.this);
+//		    	ExecutorService.tcpServer.registerInstrumentationLauncher(TcpServerActivity.this);
+			} 
+	    	catch (RemoteException e) {
+				Log.e(TAG, "Error while trying to register instrumentation launcher", e);
+			}
 		  }
 		 
 		  /**
@@ -115,18 +123,13 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	    	
 	    	setContentView(R.layout.activity_tcp_server);
 	    	setServerDetailsText();
-
-	    	this.serverThread = TcpServer.getInstance(this.serverPort);
-	    	this.serverThread.registerInstrumentationLauncher(this);
-	    	this.serverThread.registerDataExecutor(this);
-	    	this.serverThread.startServerCommunication();
 	    	
 	    	Intent service = new Intent(ExecutorService.class.getName());
 	    	startService(service);
 	    	bindService(service,this.serviceConnection , 0);
         }
     }
-	
+
 	/**
 	 * updates the screen by the selected menu item
 	 */
@@ -143,7 +146,7 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	    }
 	    return result;
 	}
-	
+
 	/**
 	 * will display the new port dialogue and restart the server with the new port
 	 */
@@ -162,7 +165,7 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	            try {
 		            serverPort = Integer.parseInt(value.toString());
 		            setServerDetailsText();
-		            serverThread.setNewPort(serverPort);
+		            serviceApi.startServerCommunication(serverPort);
 				} 
 	            catch (Exception e) {
 	            	Log.e(TAG, "Exception in parse port", e);
@@ -177,33 +180,35 @@ public class TcpServerActivity extends Activity implements IIntsrumentationLaunc
 	        }
 	    }).show();
 	}
-
-	/**
-	 * receives information from the server and execute the service
-	 */
-	@Override
-	public String dataReceived(String data) {
-		String result = null;
-		try {
-			Log.d(TAG, "Executing command : "+data);
-			result = this.serviceApi.executeCommand(data);
+//
+//	/**
+//	 * will start the instrumentation server
+//	 */
+//	public void startInstrumentationServer(String launcherActivityClass) {
+//		Log.i(TAG, "Launching instrumentation for : "+launcherActivityClass);
+//		Bundle savedInstanceState  = new Bundle();
+//    	savedInstanceState.putString("launcherActivityClass", launcherActivityClass);
+//		startInstrumentation(new ComponentName("org.topq.mobile.server.application", "org.topq.mobile.server.impl.RobotiumExecutor"), null, savedInstanceState);
+//		Log.i(TAG, "Finished instrumentation launch");
+//	}
+	
+	private IInstrumentationLauncher.Stub instrumentationLauncherListener = new IInstrumentationLauncher.Stub() {
+		/**
+		 * starting the instrumentation defined in the input string
+		 */
+		public void startInstrumentationServer(String launcherActivityClass) throws RemoteException {
+			try {
+				Log.i(TAG, "Launching instrumentation for : "+launcherActivityClass);
+				Bundle savedInstanceState  = new Bundle();
+		    	savedInstanceState.putString("launcherActivityClass", launcherActivityClass);
+				startInstrumentation(new ComponentName("org.topq.mobile.server.application", "org.topq.mobile.server.impl.RobotiumExecutor"), null, savedInstanceState);
+				Log.i(TAG, "Finished instrumentation launch");
+			} 
+			catch (Exception e) {
+				Log.e(TAG, "Error in command execution", e);
+			}
 		}
-		catch (RemoteException e) {
-			Log.e(TAG,"Error in service API",e);
-		}  
-		return result;
-	}
-
-	/**
-	 * will start the instrumentation server
-	 */
-	public void startInstrrumentationServer(String launcherActivityClass) {
-		Log.i(TAG, "Launching instrumentation for : "+launcherActivityClass);
-		Bundle savedInstanceState  = new Bundle();
-    	savedInstanceState.putString("launcherActivityClass", launcherActivityClass);
-		startInstrumentation(new ComponentName("org.topq.mobile.server.application", "org.topq.mobile.server.impl.RobotiumExecutor"), null, savedInstanceState);
-		Log.i(TAG, "Finished instrumentation launch");
-	}
+	};
 
 	/**
 	 * displays the menu
