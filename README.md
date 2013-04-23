@@ -5,6 +5,10 @@ Mobile-Automation framework is an open-source framework for writing remote autom
 This framework is designed for the automation expert in such way that it will provide
 all the tools and infrastructure that is needed in order for him to build automated tests for android platform.
 
+<b><h3>Change Log :</h3></b>
+- 23/04/2013 : Version 1.1
+   added multi instrumentation functionality
+   added test example for multi instrumentation (using example and google searchable dictionary sample)
 
 
 <b><h3>The Mobile-Automation framework is comprised of the following components:</h3></b>
@@ -25,5 +29,11 @@ verify what is the AUT's package and main activity .
 - Change the AndroidManifest.xml instrumentation element of the tcpServer project with this line :  
    &lt;instrumentation android:targetPackage="&lt;AUT_PACKAGE_NAME&gt;" android:name="org.topq.mobile.server.impl.RobotiumExecutor"/&gt; 
 - Use the client mobile interface to control the AUT
+
+
+<b><h3>How To test mutli applications :</h3></b>
+- Add to tcpServerActivity application manifest another instrumentation element
+- duplicate the robotiumExecutor class to another name of class
+- everytime you want to perform a set of actions on an application you need to change the executor id (see example test)
 
 
