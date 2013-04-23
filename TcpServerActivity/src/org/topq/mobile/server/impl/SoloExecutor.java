@@ -31,8 +31,8 @@ public class SoloExecutor {
 
 	private static final String TAG = "SoloExecutor";
 	private Instrumentation instrumentation;
-	private Solo solo;
 	private final ISoloProvider soloProvider;
+	private Solo solo;
 
 	/**
 	 * creates a solo executor
@@ -52,86 +52,89 @@ public class SoloExecutor {
 	 * @throws Exception
 	 */
 	public String execute(final String data) throws Exception {
-//		ScriptParser parser;
-//		JSONObject result = new JSONObject();
-//		parser = new ScriptParser(data);
 		CommandRequest request = JsonParser.fromJson(data, CommandRequest.class);
 		CommandResponse response = new CommandResponse();
-//		for (CommandParser command : parser.getCommands()) {
-			String commandStr = request.getCommand();
-			if (commandStr.equals("enterText")) {
-				response = enterText(request.getParams());
-			} 
-			else if (commandStr.equals("isButtonVisible")) {
-				response = isButtonVisible(request.getParams());
-			} 
-			else if (commandStr.equals("clickInControlByIndex")) {
-				response = clickInControlByIndex(request.getParams());
-			} 
-			else if (commandStr.equals("isViewVisibleByViewName")) {
-				response = isViewVisibleByViewName(request.getParams());
-			} 
-			else if (commandStr.equals("isViewVisibleByViewId")) {
-				response = isViewVisibleByViewId(request.getParams());
-			} 
-			else if (commandStr.equals("clickOnButton")) {
-				response = clickOnButton(request.getParams());
-			} 
-			else if (commandStr.equals("launch")) {
-				response = launch();
-			} 
-			else if (commandStr.equals("clickInList")) {
-				response = clickInList(request.getParams());
-			} 
-			else if (commandStr.equals("clearEditText")) {
-				response = clearEditText(request.getParams());
-			} 
-			else if (commandStr.equals("clickOnButtonWithText")) {
-				response = clickOnButtonWithText(request.getParams());
-			} 
-			else if (commandStr.equals("clickOnView")) {
-				response = clickOnView(request.getParams());
-			} 
-			else if (commandStr.equals("clickOnText")) {
-				response = clickOnText(request.getParams());
-			} 
-			else if (commandStr.equals("sendKey")) {
-				response = sendKey(request.getParams());
-			} 
-			else if (commandStr.equals("clickOnMenuItem")) {
-				response = clickOnMenuItem(request.getParams());
-			} 
-			else if (commandStr.equals("getText")) {
-				response = getText(request.getParams());
-			} 
-			else if (commandStr.equals("getTextViewIndex")) {
-				response = getTextViewIndex(request.getParams());
-			} 
-			else if (commandStr.equals("getTextView")) {
-				response = getTextView(request.getParams());
-			} 
-			else if (commandStr.equals("getCurrentTextViews")) {
-				response = getCurrentTextViews(request.getParams());
-			} 
-			else if (commandStr.equals("clickOnHardware")) {
-				response = clickOnHardware(request.getParams());
-			} 
-			else if (commandStr.equals("createFileInServer")) {
-				response = createFileInServer(request.getParams());
-			} 
-			else if (commandStr.equals("closeActivity")) {
-				response = closeActivity();
-			} 
-			else if (commandStr.equals("activateIntent")) {
-				response = activateIntent(request.getParams());
-			}
-//		}
-			response.setOriginalCommand(request.getCommand());
-			response.setParams(request.getParams());
-			String result = JsonParser.toJson(response);
+		if (!this.soloProvider.getLastExecutorID().equals(request.getExecutorID())) {
+			this.soloProvider.syncActivity();
+		}
+		String commandStr = request.getCommand();
+		if (commandStr.equals("enterText")) {
+			response = enterText(request.getParams());
+		} 
+		else if (commandStr.equals("isButtonVisible")) {
+			response = isButtonVisible(request.getParams());
+		} 
+		else if (commandStr.equals("clickInControlByIndex")) {
+			response = clickInControlByIndex(request.getParams());
+		} 
+		else if (commandStr.equals("isViewVisibleByViewName")) {
+			response = isViewVisibleByViewName(request.getParams());
+		} 
+		else if (commandStr.equals("isViewVisibleByViewId")) {
+			response = isViewVisibleByViewId(request.getParams());
+		} 
+		else if (commandStr.equals("clickOnButton")) {
+			response = clickOnButton(request.getParams());
+		} 
+		else if (commandStr.equals("launch")) {
+			response = launch();
+		} 
+		else if (commandStr.equals("clickInList")) {
+			response = clickInList(request.getParams());
+		} 
+		else if (commandStr.equals("clearEditText")) {
+			response = clearEditText(request.getParams());
+		} 
+		else if (commandStr.equals("clickOnButtonWithText")) {
+			response = clickOnButtonWithText(request.getParams());
+		} 
+		else if (commandStr.equals("clickOnView")) {
+			response = clickOnView(request.getParams());
+		} 
+		else if (commandStr.equals("clickOnText")) {
+			response = clickOnText(request.getParams());
+		} 
+		else if (commandStr.equals("sendKey")) {
+			response = sendKey(request.getParams());
+		} 
+		else if (commandStr.equals("clickOnMenuItem")) {
+			response = clickOnMenuItem(request.getParams());
+		} 
+		else if (commandStr.equals("getText")) {
+			response = getText(request.getParams());
+		} 
+		else if (commandStr.equals("getTextViewIndex")) {
+			response = getTextViewIndex(request.getParams());
+		} 
+		else if (commandStr.equals("getTextView")) {
+			response = getTextView(request.getParams());
+		} 
+		else if (commandStr.equals("getCurrentTextViews")) {
+			response = getCurrentTextViews(request.getParams());
+		} 
+		else if (commandStr.equals("clickOnHardware")) {
+			response = clickOnHardware(request.getParams());
+		} 
+		else if (commandStr.equals("createFileInServer")) {
+			response = createFileInServer(request.getParams());
+		} 
+		else if (commandStr.equals("closeActivity")) {
+			response = closeActivity();
+		} 
+		else if (commandStr.equals("activateIntent")) {
+			response = activateIntent(request.getParams());
+		}
+		else if (commandStr.equals("clickOnImageButton")) {
+			response = clickOnImageButton(request.getParams());
+		}
+		else if (commandStr.equals("clickOnActionBarItem")) {
+			response = clickOnActionBarButton(request.getParams());
+		}
+		response.setOriginalCommand(request.getCommand());
+		response.setParams(request.getParams());
+		String result = JsonParser.toJson(response);
 		Log.i(TAG,"The Result is:"+result);
 		return result;
-
 	}
 
 	/**
@@ -473,6 +476,46 @@ public class SoloExecutor {
 		return result;
 	}
 
+	/**
+	 * click on button with image in index
+	 * @param arguments index of the button
+	 * @return response with the status of the command
+	 */
+	private CommandResponse clickOnImageButton(String[] arguments) {
+		String command = "the command  clickOnImage";
+		CommandResponse result = new CommandResponse();
+		try {
+			command += "(" + arguments[0] + ")";
+			this.solo.clickOnImage(Integer.parseInt(arguments[0]));
+			result.setResponse(command);
+			result.setSucceeded(true);
+		}
+		catch (Throwable e) {
+			result = handleException(command, e);
+		}
+		return result;
+	}
+	
+	/**
+	 * click on button with image in index
+	 * @param arguments index of the button
+	 * @return response with the status of the command
+	 */
+	private CommandResponse clickOnActionBarButton(String[] arguments) {
+		String command = "the command  clickOnActionBarItem";
+		CommandResponse result = new CommandResponse();
+		try {
+			command += "(" + arguments[0] + ")";
+			this.solo.clickOnActionBarItem(Integer.parseInt(arguments[0]));
+			result.setResponse(command);
+			result.setSucceeded(true);
+		}
+		catch (Throwable e) {
+			result = handleException(command, e);
+		}
+		return result;
+	}
+	
 	/**
 	 * click on button with the input text
 	 * @param arguments the text of the button to click

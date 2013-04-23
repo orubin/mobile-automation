@@ -12,14 +12,42 @@ import org.topq.mobile.common.client.enums.HardwareButtons;
  */
 public interface MobileClientInterface {
 	
+	
+	/**
+	 * click on action bar item button with index
+	 * @param index index of the image button to click
+	 * @return response with the status of the command
+	 */
+	public String clickOnActionBarItem(int index) throws Exception;
+	
+	/**
+	 * click on image button with index
+	 * @param index index of the image button to click
+	 * @return response with the status of the command
+	 */
+	public String clickOnImageButton(int index) throws Exception;
+	
+	/**
+	 * will get the executor id
+	 * @return the executor id
+	 */
+	public String getExecutorID();
+	
+	/**
+ 	* will set the executor id
+ 	* @param executorID the current unique executor id
+ 	*/
+	public void setExecutorID(String executorID);
+	
 	/**
 	 * NOTE ! THIS METHOD MUST BE THE FIRST COMMAND BEFORE ANY OTHER COMMAND
 	 * the launch method will launch the instrumentation of the application
 	 * @param launcherActivityClass the full class name with the package of the main launcher activity
+	 * @param executorFullClassName the full name of the executor class that handles this app 
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String launch(String launcherActivityClass) throws Exception;
+	public String launch(String launcherActivityClass,String executorFullClassName) throws Exception;
 	
 	
 	/**

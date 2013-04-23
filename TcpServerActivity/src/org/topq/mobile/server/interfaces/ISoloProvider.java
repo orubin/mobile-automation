@@ -10,5 +10,6 @@ import com.jayway.android.robotium.solo.Solo;
 public interface ISoloProvider {
 	
 	public Solo getSolo();
-	
+	public String getLastExecutorID();
+	public Solo syncActivity();
 }

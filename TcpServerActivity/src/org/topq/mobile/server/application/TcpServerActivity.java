@@ -5,17 +5,14 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.http.conn.util.InetAddressUtils;
 import org.topq.mobile.common.client.enums.ClientProperties;
 import org.topq.mobile.common.server.consts.TcpConsts;
 import org.topq.mobile.server.interfaces.IExecutorService;
-import org.topq.mobile.server.interfaces.IDataCallback;
 
 import org.topq.mobile.server.application.R;
 import org.topq.mobile.server.impl.ExecutorService;
-import org.topq.mobile.server.impl.TcpServer;
 import org.topq.mobile.server.interfaces.IInstrumentationLauncher;
 
 import android.os.Bundle;
@@ -56,8 +53,6 @@ public class TcpServerActivity extends Activity {
 		    try {
 		    	serviceApi.startServerCommunication(serverPort);
 		    	serviceApi.registerInstrumenationLauncher(instrumentationLauncherListener);
-//				serviceApi.registerInstrumenationLauncher(TcpServerActivity.this);
-//		    	ExecutorService.tcpServer.registerInstrumentationLauncher(TcpServerActivity.this);
 			} 
 	    	catch (RemoteException e) {
 				Log.e(TAG, "Error while trying to register instrumentation launcher", e);
@@ -180,28 +175,18 @@ public class TcpServerActivity extends Activity {
 	        }
 	    }).show();
 	}
-//
-//	/**
-//	 * will start the instrumentation server
-//	 */
-//	public void startInstrumentationServer(String launcherActivityClass) {
-//		Log.i(TAG, "Launching instrumentation for : "+launcherActivityClass);
-//		Bundle savedInstanceState  = new Bundle();
-//    	savedInstanceState.putString("launcherActivityClass", launcherActivityClass);
-//		startInstrumentation(new ComponentName("org.topq.mobile.server.application", "org.topq.mobile.server.impl.RobotiumExecutor"), null, savedInstanceState);
-//		Log.i(TAG, "Finished instrumentation launch");
-//	}
 	
 	private IInstrumentationLauncher.Stub instrumentationLauncherListener = new IInstrumentationLauncher.Stub() {
 		/**
 		 * starting the instrumentation defined in the input string
 		 */
-		public void startInstrumentationServer(String launcherActivityClass) throws RemoteException {
+		public void startInstrumentationServer(String launcherActivityClass,String executorID,String executorFullClassName) throws RemoteException {
 			try {
 				Log.i(TAG, "Launching instrumentation for : "+launcherActivityClass);
 				Bundle savedInstanceState  = new Bundle();
 		    	savedInstanceState.putString("launcherActivityClass", launcherActivityClass);
-				startInstrumentation(new ComponentName("org.topq.mobile.server.application", "org.topq.mobile.server.impl.RobotiumExecutor"), null, savedInstanceState);
+		    	savedInstanceState.putString("executorID", executorID);
+				startInstrumentation(new ComponentName("org.topq.mobile.server.application", executorFullClassName), null, savedInstanceState);
 				Log.i(TAG, "Finished instrumentation launch");
 			} 
 			catch (Exception e) {

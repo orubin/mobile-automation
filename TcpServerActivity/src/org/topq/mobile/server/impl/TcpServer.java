@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.topq.mobile.common.datamodel.CommandRequest;
@@ -26,9 +28,10 @@ public class TcpServer implements Runnable {
 	private int listenerPort;
 	private boolean serverLiving = true;
 	private IInstrumentationLauncher instrumentationLauncher;
-	private IDataCallback dataExecutor;
+	private Map<String,IDataCallback> dataExecutors;
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
+	private String lastExecutorID;
 	
 	/**
 	 * default ctor
@@ -37,7 +40,7 @@ public class TcpServer implements Runnable {
 	private TcpServer(int listenerPort) {
 		this.listenerPort = listenerPort;
 		this.instrumentationLauncher = null;
-		this.dataExecutor = null;
+		this.dataExecutors = new HashMap<String,IDataCallback>();
 		TcpServer.TAG = "TcpServer("+this.listenerPort+")";
 	}
 
@@ -98,9 +101,10 @@ public class TcpServer implements Runnable {
 	 * register a data executor
 	 * @param dataExecutor
 	 */
-	public void registerDataExecutor(IDataCallback dataExecutor) {
-		Log.d(TAG, "Registering data launcher : "+dataExecutor);
-		this.dataExecutor = dataExecutor;
+	public void registerDataExecutor(String executorID,IDataCallback dataExecutor) {
+		Log.d(TAG, "Registering data launcher : "+dataExecutor + "with id : "+executorID);
+		this.dataExecutors.put(executorID, dataExecutor);
+		this.lastExecutorID = executorID;
 	}
 	
 	/**
@@ -119,22 +123,24 @@ public class TcpServer implements Runnable {
 				BufferedReader clientIn = null;
 				try {
 					Log.i(TAG, "Connection established");
+					String executorID = null;
 					clientOut = new PrintWriter(this.clientSocket.getOutputStream(), true);
 					clientIn = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
 					String line = clientIn.readLine();	
 					if (line != null) {
 						Log.d(TAG, "Received: '" + line + "'");
 						CommandRequest request = JsonParser.fromJson(line,CommandRequest.class);
-//						for (CommandParser command : parser.getCommands()) {
-							if(request.getCommand().equals("launch") && this.instrumentationLauncher != null){
-								Log.d(TAG, "Recieved launch command");
-								this.instrumentationLauncher.startInstrumentationServer(request.getParams()[0]);
-								Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-							}
-//						}
+						executorID = request.getExecutorID();
+						if(request.getCommand().equals("launch") && this.instrumentationLauncher != null){
+							Log.d(TAG, "Recieved launch command");
+							this.instrumentationLauncher.startInstrumentationServer(request.getParams()[0],executorID,request.getParams()[1]);
+							Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+							this.lastExecutorID = executorID;
+						}
 					}
-					Log.i(TAG, "Sending command to executor");
-					String response = dataExecutor.dataReceived(line);
+					Log.i(TAG, "Sending command to executor id : "+executorID);
+					String response = this.dataExecutors.get(executorID).dataReceived(line);
+					this.lastExecutorID = executorID;
 					Log.d(TAG,"Command response is : "+response);
 					clientOut.println(response);	
 				}  
@@ -173,6 +179,10 @@ public class TcpServer implements Runnable {
 				}
 			}
 		}
+	}
+	
+	public String getLastExecutorID() {
+		return this.lastExecutorID;
 	}
 
 }

@@ -22,7 +22,9 @@ public class MobileClient implements MobileClientInterface {
 	private TcpClient tcpClient;
 	private int serverPort;
 	private String serverHost;
+	private String executorID;
 	
+
 	/**
 	 * this CTOR will init a tcp client object with the input params 
 	 * @param serverHost the server ip
@@ -68,7 +70,7 @@ public class MobileClient implements MobileClientInterface {
 	private String sendData(String command, String... params) throws Exception {
 		String resultValue;
 		try {
-			CommandResponse result = sendDataAndGetJSonObj(new CommandRequest(command,params));
+			CommandResponse result = sendDataAndGetJSonObj(new CommandRequest(this.executorID,command,params));
 			resultValue = result.getResponse();
 			if (!result.isSucceeded()) {
 				logger.error(result);
@@ -109,15 +111,35 @@ public class MobileClient implements MobileClientInterface {
 		return result;
 	}
 
+	
+	/**
+	 * click on image button with index
+	 * @param index index of the image button to click
+	 * @return response with the status of the command
+	 */
+	public String clickOnImageButton(int index) throws Exception {
+		return sendData("clickOnImageButton",Integer.toString(index));
+	}
+	
+	/**
+	 * click on action bar item button with index
+	 * @param index index of the image button to click
+	 * @return response with the status of the command
+	 */
+	public String clickOnActionBarItem(int index) throws Exception {
+		return sendData("clickOnActionBarItem",Integer.toString(index));
+	}
+	
 	/**
 	 * NOTE ! THIS METHOD MUST BE THE FIRST COMMAND BEFORE ANY OTHER COMMAND
 	 * the launch method will launch the instrumentation of the application
 	 * @param launcherActivityClass the full class name with the package of the main launcher activity
+	 * @param executorFullClassName the full class name of the executor class that handles this app
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String launch(String launcherActivityClass) throws Exception {
-		return sendData("launch",launcherActivityClass);
+	public String launch(String launcherActivityClass,String executorFullClassName) throws Exception {
+		return sendData("launch",launcherActivityClass,executorFullClassName);
 	}
 	
 	/**
@@ -266,6 +288,14 @@ public class MobileClient implements MobileClientInterface {
 	 */
 	public void closeConnection() throws Exception {
 		sendData("exit");
+	}
+	
+	public String getExecutorID() {
+		return this.executorID;
+	}
+
+	public void setExecutorID(String executorID) {
+		this.executorID = executorID;
 	}
 	
 //	public void closeActivity() throws Exception {
