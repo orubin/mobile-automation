@@ -4,7 +4,7 @@ import org.topq.mobile.server.interfaces.IExecutorService;
 import org.topq.mobile.server.interfaces.IDataCallback;
 import org.topq.mobile.server.interfaces.ISoloProvider;
 
-import com.jayway.android.robotium.solo.Solo;
+
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -16,6 +16,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
+
+import com.jayway.android.robotium.solo.Solo;
+import com.jayway.android.robotium.solo.SoloEnhanced;
 
 
 /**
@@ -128,7 +131,7 @@ public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
 		}
 		if(this.solo == null){
 			prepareLooper();
-			this.solo = new Solo(this,this.myActive);	
+			this.solo = new SoloEnhanced(this,this.myActive);	
 		}
 		return this.solo;
 	}

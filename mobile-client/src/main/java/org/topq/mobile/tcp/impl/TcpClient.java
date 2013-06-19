@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 
 /**
  * @author limor bortman, tal ben shabtay

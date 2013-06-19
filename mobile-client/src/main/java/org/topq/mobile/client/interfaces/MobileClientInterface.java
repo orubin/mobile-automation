@@ -1,6 +1,9 @@
 package org.topq.mobile.client.interfaces;
 
+import java.io.File;
+
 import org.topq.mobile.common.client.enums.HardwareButtons;
+import org.topq.mobile.common.datamodel.CommandResponse;
 
 /**
  * 
@@ -12,6 +15,10 @@ import org.topq.mobile.common.client.enums.HardwareButtons;
  */
 public interface MobileClientInterface {
 	
+	public enum EDGE {
+		TOP, BOTTOM
+	}
+	
 	/**
 	 * NOTE ! THIS METHOD MUST BE THE FIRST COMMAND BEFORE ANY OTHER COMMAND
 	 * the launch method will launch the instrumentation of the application
@@ -19,7 +26,7 @@ public interface MobileClientInterface {
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String launch(String launcherActivityClass) throws Exception;
+	public CommandResponse launch(String launcherActivityClass) throws Exception;
 	
 	
 	/**
@@ -28,7 +35,7 @@ public interface MobileClientInterface {
 	 * @return the text of the text view
 	 * @throws Exception
 	 */
-	public String getTextView(int index) throws Exception ;
+	public CommandResponse getTextView(int index) throws Exception ;
 	
 	/**
 	 * will get the id of the text view with the input text
@@ -36,14 +43,14 @@ public interface MobileClientInterface {
 	 * @return id of the text view
 	 * @throws Exception
 	 */
-	public String getTextViewIndex(String text) throws Exception;
+	public CommandResponse getTextViewIndex(String text) throws Exception;
 	
 	/**
 	 * will get a list of all the texts of the current display text views
 	 * @return list of all the text views current displayed
 	 * @throws Exception
 	 */
-	public String getCurrentTextViews() throws Exception;
+	public CommandResponse getCurrentTextViews() throws Exception;
 	
 	/**
 	 * will get the text of the view by the input index
@@ -51,7 +58,7 @@ public interface MobileClientInterface {
 	 * @return the text of the input index text view
 	 * @throws Exception
 	 */
-	public String getText(int index) throws Exception;
+	public CommandResponse getText(int index) throws Exception;
 	
 	/**
 	 * will click on the menu item with the input text
@@ -59,7 +66,7 @@ public interface MobileClientInterface {
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String clickOnMenuItem(String item) throws Exception;
+	public CommandResponse clickOnMenuItem(String item) throws Exception;
 	
 	/**
 	 * will click on any view with the input index
@@ -67,7 +74,7 @@ public interface MobileClientInterface {
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String clickOnView(int index) throws Exception;
+	public CommandResponse clickOnView(int index) throws Exception;
 	
 	/**
 	 * will enter text in a text box by the input text and index
@@ -76,23 +83,15 @@ public interface MobileClientInterface {
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String enterText(int index, String text) throws Exception;
+	public CommandResponse enterText(int index, String text) throws Exception;
 	
 	/**
 	 * will click on button with the input index
-	 * @param index the index of the button on the screen
+	 * @param line the index of the button on the screen
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String clickOnButton(int index) throws Exception;
-	
-	/**
-	 * will click on list item with the input index
-	 * @param index the index of the item in the list
-	 * @return return status of the operation
-	 * @throws Exception
-	 */
-	public String clickInList(int index) throws Exception;
+	public CommandResponse clickOnButton(int line) throws Exception;
 	
 	/**
 	 * will clear a text box with the input index
@@ -100,7 +99,7 @@ public interface MobileClientInterface {
 	 * @return return status of the operation 
 	 * @throws Exception
 	 */
-	public String clearEditText(int index) throws Exception;
+	public CommandResponse clearEditText(int index) throws Exception;
 	
 	/**
 	 * will click on button that includes the input text
@@ -108,7 +107,7 @@ public interface MobileClientInterface {
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String clickOnButtonWithText(String text) throws Exception;
+	public CommandResponse clickOnButtonWithText(String text) throws Exception;
 	
 	/**
 	 * will click on the text with the input  text
@@ -116,7 +115,7 @@ public interface MobileClientInterface {
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String clickOnText(String text) throws Exception;
+	public CommandResponse clickOnText(String text) throws Exception;
 
 	/**
 	 * simulate a click on an hardware button
@@ -124,7 +123,7 @@ public interface MobileClientInterface {
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String clickOnHardwereButton(HardwareButtons button) throws Exception;
+	public CommandResponse clickOnHardwareButton(HardwareButtons button) throws Exception;
 	
 	/**
 	 * will click on the single input char
@@ -132,12 +131,51 @@ public interface MobileClientInterface {
 	 * @return return status of the operation
 	 * @throws Exception
 	 */
-	public String sendKey(int key) throws Exception;
+	public CommandResponse sendKey(int key) throws Exception;
 	
 	/**
 	 * will close the connection to the server
 	 * @throws Exception
 	 */
 	public void closeConnection() throws Exception;
+	
+	public CommandResponse getViews() throws Exception;
+	
+	public CommandResponse swipeLeft() throws Exception;
+	
+	public CommandResponse swipeRight() throws Exception;
+	
+	public CommandResponse clickOnImageButton(int index) throws Exception;
+	
+	public CommandResponse clickOnImage(int index) throws Exception;
+	
+	public CommandResponse scrollDown() throws Exception;
+	
+	public CommandResponse isTextVisible(String text) throws Exception;
+	
+	public CommandResponse scrollDownUntilTextIsVisible(String text) throws Exception;
 
+	public CommandResponse getCurrentActivity() throws Exception;
+	
+	public CommandResponse clickOnActionBarItem(int index) throws Exception;
+	
+	public CommandResponse clickOnScreen(float x, float y, boolean relative) throws Exception;
+	
+	public CommandResponse drag(float fromX, float toX, float fromY, float toY, int steps, boolean relative) throws Exception;
+	
+	public CommandResponse setOrientation(int orientation) throws Exception;
+	
+	public CommandResponse scrollToEdge(EDGE edge) throws Exception;
+	
+	public CommandResponse verifyViewExistsByDescription(String description, boolean click, boolean startsWith, boolean clickInSpecificPosition, float x, float y) throws Exception;
+	
+	public CommandResponse clickInList(int index1, int index2) throws Exception;
+	
+	public CommandResponse clickInList(int index) throws Exception;
+	
+	public CommandResponse getAllVisibleIds() throws Exception;
+	
+	public CommandResponse waitForActivity(String activity,int timeout) throws Exception;
+	
+	public File takeScreenshot() throws Exception;
 }
