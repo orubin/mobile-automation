@@ -4,7 +4,7 @@
 
 	<groupId>org.topq.mobile</groupId>
 	<artifactId>mobile-client</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.00</version>
 	<packaging>jar</packaging>
 	<name>mobile-client</name>
 	<url>http://maven.apache.org</url>
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>org.topq.mobile</groupId>
 			<artifactId>common-mobile</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.00</version>
 		</dependency>
 		<dependency>
 			<groupId>net.iharder</groupId>
