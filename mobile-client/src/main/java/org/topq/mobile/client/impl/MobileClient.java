@@ -48,8 +48,7 @@ public class MobileClient implements MobileClientInterface {
 	 *            the parameters to send along side of the command
 	 * @throws Exception
 	 */
-	private CommandResponse sendData(String command, String... params)
-			throws Exception {
+	private CommandResponse sendData(String command, String... params) throws Exception {
 		CommandResponse result = null;
 		try {
 			result = sendDataAndGetJSonObj(new CommandRequest(command, params));
@@ -68,8 +67,7 @@ public class MobileClient implements MobileClientInterface {
 	 * @return a command response of object the input command request
 	 * @throws Exception
 	 */
-	private CommandResponse sendDataAndGetJSonObj(CommandRequest request)
-			throws Exception {
+	private CommandResponse sendDataAndGetJSonObj(CommandRequest request) throws Exception {
 		String jsonRequest = JsonParser.toJson(request);
 		logger.info("Sending command: " + jsonRequest);
 		CommandResponse result = null;
@@ -78,8 +76,7 @@ public class MobileClient implements MobileClientInterface {
 		try {
 			String resultStr = null;
 			if ((resultStr = this.tcpClient.sendData(jsonRequest)) == null) {
-				throw new Exception(
-						"No data recvied from server! pleas check server log!");
+				throw new Exception("No data recvied from server! pleas check server log!");
 			}
 			result = JsonParser.fromJson(resultStr, CommandResponse.class);
 		} catch (Exception e) {
@@ -101,8 +98,7 @@ public class MobileClient implements MobileClientInterface {
 	 */
 
 	@Override
-	public CommandResponse launch(String launcherActivityClass)
-			throws Exception {
+	public CommandResponse launch(String launcherActivityClass) throws Exception {
 		return sendData("launch", launcherActivityClass);
 	}
 
@@ -183,12 +179,10 @@ public class MobileClient implements MobileClientInterface {
 	}
 
 	@Override
-	public CommandResponse verifyViewExistsByDescription(String description,
-			boolean click, boolean startsWith, boolean clickInSpecificPosition,
-			float x, float y) throws Exception {
-		return sendData("verifyViewExistsByDescription", description,
-				Boolean.toString(click), Boolean.toString(startsWith),
-				Boolean.toString(clickInSpecificPosition), Float.toString(x),
+	public CommandResponse verifyViewExistsByDescription(String description, boolean click, boolean startsWith,
+			boolean clickInSpecificPosition, float x, float y) throws Exception {
+		return sendData("verifyViewExistsByDescription", description, Boolean.toString(click),
+				Boolean.toString(startsWith), Boolean.toString(clickInSpecificPosition), Float.toString(x),
 				Float.toString(y));
 	}
 
@@ -260,10 +254,8 @@ public class MobileClient implements MobileClientInterface {
 	}
 
 	@Override
-	public CommandResponse waitForActivity(String activityName, int timeout)
-			throws Exception {
-		return sendData("waitForActivity", activityName,
-				Integer.toString(timeout));
+	public CommandResponse waitForActivity(String activityName, int timeout) throws Exception {
+		return sendData("waitForActivity", activityName, Integer.toString(timeout));
 	}
 
 	/**
@@ -288,8 +280,7 @@ public class MobileClient implements MobileClientInterface {
 	 * @throws Exception
 	 */
 	@Override
-	public CommandResponse clickOnHardwareButton(HardwareButtons button)
-			throws Exception {
+	public CommandResponse clickOnHardwareButton(HardwareButtons button) throws Exception {
 		return sendData("clickOnHardware", button.name());
 	}
 
@@ -339,8 +330,7 @@ public class MobileClient implements MobileClientInterface {
 	}
 
 	@Override
-	public CommandResponse scrollDownUntilTextIsVisible(String text)
-			throws Exception {
+	public CommandResponse scrollDownUntilTextIsVisible(String text) throws Exception {
 		return sendData("scrollDownUntilTextIsVisible", new String[] { text });
 	}
 
@@ -351,26 +341,21 @@ public class MobileClient implements MobileClientInterface {
 
 	@Override
 	public CommandResponse clickOnActionBarItem(int index) throws Exception {
-		return sendData("clickOnActionBarItem",
-				new String[] { Integer.toString(index) });
+		return sendData("clickOnActionBarItem", new String[] { Integer.toString(index) });
 	}
 
 	@Override
-	public CommandResponse clickOnScreen(float x, float y, boolean relative)
+	public CommandResponse clickOnScreen(float x, float y, boolean relative) throws Exception {
+		return sendData("clickOnScreen", new String[] { Float.toString(x), Float.toString(y),
+				(relative ? "relative" : "absolute") });
+	}
+
+	@Override
+	public CommandResponse drag(float fromX, float toX, float fromY, float toY, int steps, boolean relative)
 			throws Exception {
-		return sendData("clickOnScreen", new String[] { Float.toString(x),
-				Float.toString(y), (relative ? "relative" : "absolute") });
-	}
-
-	@Override
-	public CommandResponse drag(float fromX, float toX, float fromY, float toY,
-			int steps, boolean relative) throws Exception {
-		return sendData(
-				"drag",
-				new String[] { Float.toString(fromX), Float.toString(toX),
-						Float.toString(fromY), Float.toString(toY),
-						Integer.toString(steps),
-						(relative ? "relative" : "absolute") });
+		return sendData("drag",
+				new String[] { Float.toString(fromX), Float.toString(toX), Float.toString(fromY), Float.toString(toY),
+						Integer.toString(steps), (relative ? "relative" : "absolute") });
 	}
 
 	@Override
@@ -385,8 +370,7 @@ public class MobileClient implements MobileClientInterface {
 
 	@Override
 	public CommandResponse scrollToEdge(EDGE edge) throws Exception {
-		return sendData("scrollToEdge",
-				new String[] { (edge == EDGE.TOP ? "top" : "bottom") });
+		return sendData("scrollToEdge", new String[] { (edge == EDGE.TOP ? "top" : "bottom") });
 	}
 
 	/**
@@ -425,13 +409,17 @@ public class MobileClient implements MobileClientInterface {
 
 	@Override
 	public CommandResponse clickInList(int index1, int index2) throws Exception {
-		return sendData("clickInList", Integer.toString(index1),
-				Integer.toString(index2));
+		return sendData("clickInList", Integer.toString(index1), Integer.toString(index2));
 	}
 
 	@Override
 	public CommandResponse getAllVisibleIds() throws Exception {
 		return sendData("getAllVisibleIds");
+	}
+
+	@Override
+	public CommandResponse click(String expression) throws Exception {
+		return sendData("click", expression);
 	}
 
 }

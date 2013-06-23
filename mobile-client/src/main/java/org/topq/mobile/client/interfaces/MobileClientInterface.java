@@ -173,6 +173,8 @@ public interface MobileClientInterface {
 	
 	public CommandResponse clickInList(int index) throws Exception;
 	
+	public CommandResponse click(String expression) throws Exception;
+	
 	public CommandResponse getAllVisibleIds() throws Exception;
 	
 	public CommandResponse waitForActivity(String activity,int timeout) throws Exception;
