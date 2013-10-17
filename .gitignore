@@ -25,11 +25,11 @@ gen
 !LoginActivity/libs
 !LoginActivity/.classpath
 !LoginActivity/.project
-!TcpServerActivity/.project
-!TcpServerActivity/.classpath
-!TcpServerActivity/libs
+!robotium-server/.project
+!robotium-server/.classpath
+!robotium-server/libs
 
-!TcpServerActivity/.classpath
+
 
 
 
