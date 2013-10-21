@@ -1,23 +1,32 @@
 package il.co.topq.mobile.server.impl;
 
+import il.co.topq.mobile.common.datamodel.CommandRequest;
+import il.co.topq.mobile.common.datamodel.CommandResponse;
+import il.co.topq.mobile.common.server.utils.JsonParser;
 import il.co.topq.mobile.server.impl.SoloUtils.AXIS;
 import il.co.topq.mobile.server.interfaces.ISoloProvider;
 import il.co.topq.mobile.viewexpr.ViewExpressionException;
 import il.co.topq.mobile.viewexpr.ViewExpressionInterperter;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import il.co.topq.mobile.common.datamodel.CommandRequest;
-import il.co.topq.mobile.common.datamodel.CommandResponse;
-import il.co.topq.mobile.common.server.utils.JsonParser;
+
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
@@ -25,6 +34,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.jayway.android.robotium.solo.Solo;
@@ -32,15 +42,22 @@ import com.jayway.android.robotium.solo.SoloEnhanced;
 
 /**
  * 
- * @author tal ben shabtay,limor bortman executes the client command with the
- *         solo interface
+ * @author tal ben shabtay,limor bortman executes the client command with the solo interface
  */
 public class SoloExecutor {
-
+	
+	private static final String COMPLETE_ORDERS = "COMPLETE_ORDERS";
+	private static final String SETTINGS_FILE_NAME = "app_pref.dat";
 	private static final String TAG = "SoloExecutor";
 	private Instrumentation instrumentation;
 	private Solo solo;
 	private final ISoloProvider soloProvider;
+	private static final int RIGHT=22;
+	private static final int LEFT=21;
+	private static final int DOWN=19;
+	private static final int UP=19;
+	
+	
 
 	/**
 	 * creates a solo executor
@@ -88,7 +105,7 @@ public class SoloExecutor {
 			response = getCurrentActivity(request.getParams());
 		} else if (commandStr.equals("scrollDownUntilTextIsVisible")) {
 			response = scrollDownUntilTextIsVisible(request.getParams());
-		} else if (commandStr.equals("scrollDown")) {
+		} else if (commandStr.equals("scrollDownSafetly")) {
 			response = scrollDown(request.getParams());
 		} else if (commandStr.equals("isTextVisible")) {
 			response = isTextVisible(request.getParams());
@@ -154,6 +171,34 @@ public class SoloExecutor {
 			response = getAllVisibleIds();
 		} else if (commandStr.equals("click")) {
 			response = click(request.getParams());
+		}else if (commandStr.equals("closeActivity")) {
+			response = closeActivity(request.getParams());
+		}else if (commandStr.equals("clickOnMenuItemById")) {
+			response = clickOnMenuItemById(request.getParams());
+		}else if (commandStr.equals("closeApplication")) {
+			response = closeApplication();
+		}else if (commandStr.equals("clickOnViewByIndex")) {
+			response = clickOnViewByIndex(request.getParams());
+		}else if (commandStr.equals("scrollLeft")) {
+			response = scrollLeft();
+		}else if (commandStr.equals("scrollRight")) {
+			response = scrollRight();
+		}else if (commandStr.equals("scrollUp")) {
+			response = scrollUp();
+		}else if (commandStr.equals("scrollDown")) {
+			response = scrollDown();
+		}else if (commandStr.equals("clickOnRadioButton")) {
+			response = clickOnRadioButton(request.getParams());
+		}else if (commandStr.equals("clickOnActionBarHomeButton")) {
+			response = clickOnActionBarHomeButton();
+		}else if (commandStr.equals("showMenuOptions")) {
+			response = showMenuOptions();
+		}else if (commandStr.equals("pull")) {
+			response = pull(request.getParams());
+		}else if (commandStr.equals("push")) {
+			response = createFileInServer(request.getParams());
+		}else if (commandStr.equals("setPreferanceCompleteRideCounter")) {
+			response = setPreferanceCompleteRideCounter();
 		}
 		response.setOriginalCommand(request.getCommand());
 		response.setParams(request.getParams());
@@ -170,8 +215,8 @@ public class SoloExecutor {
 		Log.i(TAG, "About to click on " + expression);
 		try {
 			List<View> views = getViews(expression);
-			if (views.size() == 0){
-				result.setResponse("No views found to match expression "+expression);
+			if (views.size() == 0) {
+				result.setResponse("No views found to match expression " + expression);
 				result.setSucceeded(false);
 				return result;
 			}
@@ -197,14 +242,13 @@ public class SoloExecutor {
 		CommandResponse result = new CommandResponse();
 		try {
 			if (params[0].equals("top")) {
-				while (scrollUp()) {
-
+				while (scrollUpSafetly()) {
 				}
 				result.setSucceeded(true);
 				result.setResponse(command);
 				Log.e(TAG, "Scrollup was successfull");
 			} else {
-				while (scrollDown()) {
+				while (scrollDownSafetly()) {
 
 				}
 				result.setSucceeded(true);
@@ -268,7 +312,8 @@ public class SoloExecutor {
 				result.setResponse(command + ",Response: failed to get the activity name");
 				result.setSucceeded(false);
 			} else {
-				result.setResponse(command + ", Response: Activity name is: " + response);
+				result.setOriginalCommand(command + ", Response: Activity name is: " +response);
+				result.setResponse(response); //command + ", Response: Activity name is: " +
 				result.setSucceeded(true);
 			}
 		} catch (Throwable e) {
@@ -283,7 +328,7 @@ public class SoloExecutor {
 		String response = "";
 		try {
 			response = "scrolling down";
-			if (scrollDown()) {
+			if (scrollDownSafetly()) {
 				response += command + ",Response: " + response + " scrolled down successfully";
 				result.setSucceeded(true);
 				result.setResponse(response);
@@ -325,7 +370,7 @@ public class SoloExecutor {
 		try {
 			response = "Trying to scroll down until the requested text will be visible";
 			while (!this.solo.searchText(params[0])) {
-				if (!scrollDown()) {
+				if (!scrollDownSafetly()) {
 					break;
 				}
 			}
@@ -408,8 +453,7 @@ public class SoloExecutor {
 		String response = "";
 		try {
 			response = "attempting to swipe to the left";
-			String[] dragParams = new String[] { Float.toString(0.9f), Float.toString(0.1f), Float.toString(0.5f),
-					Float.toString(0.5f), Integer.toString(25), "relative" };
+			String[] dragParams = new String[] { Float.toString(0.9f), Float.toString(0.1f), Float.toString(0.5f), Float.toString(0.5f), Integer.toString(25), "relative" };
 			CommandResponse dragResponse = drag(dragParams);
 			result.setResponse(command + ",Response: " + response + ", " + dragResponse.getResponse());
 			result.setSucceeded(dragResponse.isSucceeded());
@@ -428,8 +472,7 @@ public class SoloExecutor {
 		String response = "";
 		try {
 			response = "attempting to swipe to the right";
-			String[] dragParams = new String[] { Float.toString(0.1f), Float.toString(0.9f), Float.toString(0.5f),
-					Float.toString(0.5f), Integer.toString(25), "relative" };
+			String[] dragParams = new String[] { Float.toString(0.1f), Float.toString(0.9f), Float.toString(0.5f), Float.toString(0.5f), Integer.toString(25), "relative" };
 			CommandResponse dragResponse = drag(dragParams);
 			result.setResponse(command + ",Response: " + response + ", " + dragResponse.getResponse());
 			result.setSucceeded(dragResponse.isSucceeded());
@@ -476,23 +519,21 @@ public class SoloExecutor {
 		String command = null;
 		CommandResponse result = new CommandResponse();
 		try {
-			command = "the command  activateIntent(" + arguments[0] + " " + arguments[1] + " " + arguments[2] + " "
-					+ arguments[3] + " " + arguments[4] + ")";
+			command = "the command  activateIntent(" + arguments[0] + " " + arguments[1] + " " + arguments[2] + " " + arguments[3] + " " + arguments[4] + ")";
 
 			/*
 			 * if (arguments[0].equals("ACTION_VIEW")) { Intent webIntent = new
-			 * Intent(Intent.ACTION_VIEW, Uri.parse(arguments[1])); Log.d(TAG,
-			 * "Sending intent to " + solo.getClass().getSimpleName());
-			 * solo.getCurrentActivity().startActivityForResult(webIntent, 1);
-			 * }else if (arguments[0].equals("com.greenroad.PlayTrip")) {
+			 * Intent(Intent.ACTION_VIEW, Uri.parse(arguments[1])); Log.d(TAG, "Sending intent to "
+			 * + solo.getClass().getSimpleName());
+			 * solo.getCurrentActivity().startActivityForResult(webIntent, 1); }else if
+			 * (arguments[0].equals("com.greenroad.PlayTrip")) {
 			 */
 			Log.d(TAG, "Sending intent");
 			Intent broadcastIntent = new Intent();
 			broadcastIntent.setAction(arguments[0]);
 			for (int i = 1; i < arguments.length; i = i + 2) {
 				broadcastIntent.putExtra(/*
-										 * solo.getCurrentActivity().
-										 * getCallingPackage()+
+										 * solo.getCurrentActivity(). getCallingPackage()+
 										 */arguments[i], arguments[i + 1]);
 			}
 			this.solo.getCurrentActivity().sendBroadcast(broadcastIntent);
@@ -500,14 +541,11 @@ public class SoloExecutor {
 			result.setSucceeded(true);
 			// }
 			/*
-			 * else if (arguments[0].equals("ACTION_SEND")) { Intent sendIntent
-			 * = new Intent(); sendIntent.setAction(arguments[0]); for(int i =
-			 * 1;i<arguments.length;i=i+2){ Log.i(TAG, "check: " + arguments[i]
-			 * + " " + arguments[i+1]);
-			 * sendIntent.putExtra(solo.getCurrentActivity
-			 * ().getCallingPackage()+
-			 * "."+arguments[i],android.content.Intent.EXTRA_TEXT,
-			 * arguments[i+1]); }
+			 * else if (arguments[0].equals("ACTION_SEND")) { Intent sendIntent = new Intent();
+			 * sendIntent.setAction(arguments[0]); for(int i = 1;i<arguments.length;i=i+2){
+			 * Log.i(TAG, "check: " + arguments[i] + " " + arguments[i+1]);
+			 * sendIntent.putExtra(solo.getCurrentActivity ().getCallingPackage()+
+			 * "."+arguments[i],android.content.Intent.EXTRA_TEXT, arguments[i+1]); }
 			 * solo.getCurrentActivity().startActivity(sendIntent); }
 			 */
 		} catch (Exception e) {
@@ -516,32 +554,6 @@ public class SoloExecutor {
 		return result;
 	}
 
-	@SuppressLint("NewApi")
-	private CommandResponse createFileInServer(String[] arguments) {
-		String command = "the command  createFileInServer";
-		CommandResponse result = new CommandResponse();
-		try {
-			if (Boolean.parseBoolean(arguments[2])) {
-				byte[] data = Base64.decode(arguments[1], Base64.URL_SAFE);
-				command += "(" + arguments[0] + ", " + data + ")";
-				command += "(" + arguments[0] + ", " + data + ")";
-				FileOutputStream fos = new FileOutputStream(arguments[0]);
-				fos.write(data);
-				fos.close();
-			} else {
-				command += "(" + arguments[0] + ", " + arguments[1] + ")";
-				FileWriter out = new FileWriter(arguments[0]);
-				out.write(arguments[1]);
-				out.close();
-			}
-			result.setResponse(command);
-			result.setSucceeded(true);
-			Log.d(TAG, "run the command:" + command);
-		} catch (Exception e) {
-			result = handleException(command, e);
-		}
-		return result;
-	}
 
 	/**
 	 * gets the text of all the current text views
@@ -579,8 +591,7 @@ public class SoloExecutor {
 		String response = "";
 		try {
 			command += "(" + arguments[0] + ")";
-			response = this.solo.getCurrentViews(TextView.class).get(Integer.parseInt(arguments[0])).getText()
-					.toString();
+			response = this.solo.getCurrentViews(TextView.class).get(Integer.parseInt(arguments[0])).getText().toString();
 			result.setResponse(command + ",Response: " + response);
 			result.setSucceeded(true);
 		} catch (Throwable e) {
@@ -630,7 +641,8 @@ public class SoloExecutor {
 		try {
 			command += "(" + arguments[0] + ")";
 			response = solo.getText(Integer.parseInt(arguments[0])).getText().toString();
-			result.setResponse(command + ",Response: " + response);
+			result.setOriginalCommand(command + ",Response: " + response);
+			result.setResponse( response);
 			result.setSucceeded(true);
 		} catch (Throwable e) {
 			result = handleException(command, e);
@@ -717,9 +729,7 @@ public class SoloExecutor {
 					result.setResponse(command);
 					result.setSucceeded(true);
 				} else {
-					result.setResponse(command
-							+ "failed due to: index to click in control is out of bounds. control touchables: "
-							+ control.getTouchables().size());
+					result.setResponse(command + "failed due to: index to click in control is out of bounds. control touchables: " + control.getTouchables().size());
 					result.setSucceeded(false);
 				}
 			} else {
@@ -733,8 +743,7 @@ public class SoloExecutor {
 	}
 
 	/**
-	 * This method will search the requested view / control by its name in the
-	 * currentViews <br>
+	 * This method will search the requested view / control by its name in the currentViews <br>
 	 * 
 	 * @param viewName
 	 *            the name of the view
@@ -824,8 +833,7 @@ public class SoloExecutor {
 							} catch (Throwable e) {
 
 							}
-							String addToCommand = (click ? (": Clicked on view with description: " + arguments[0])
-									: ("View with description: " + arguments[0] + "exists"));
+							String addToCommand = (click ? (": Clicked on view with description: " + arguments[0]) : ("View with description: " + arguments[0] + "exists"));
 							result.setResponse(command + addToCommand);
 							result.setSucceeded(true);
 							return result;
@@ -867,8 +875,7 @@ public class SoloExecutor {
 		String response = "";
 		for (View view : this.solo.getViews()) {
 			try {
-				response += view.getContentDescription() + ":" + Integer.toHexString(view.getId()) + ":"
-						+ view.getClass().getSimpleName() + "\r\n";
+				response += view.getContentDescription() + ":" + Integer.toHexString(view.getId()) + ":" + view.getClass().getSimpleName() + "\r\n";
 			} catch (Exception e) {
 			}
 		}
@@ -877,7 +884,7 @@ public class SoloExecutor {
 		return result;
 	}
 
-	private boolean scrollDown() {
+	private boolean scrollDownSafetly() {
 		int index = 0;
 		while (index < 5) {
 			if (solo.scrollDown())
@@ -891,7 +898,7 @@ public class SoloExecutor {
 		return false;
 	}
 
-	private boolean scrollUp() {
+	private boolean scrollUpSafetly() {
 		int index = 0;
 		while (index < 5) {
 			if (solo.scrollUp())
@@ -983,8 +990,7 @@ public class SoloExecutor {
 	 * checks if button is visible
 	 * 
 	 * @param arguments
-	 *            [0] search button by id or text, [1] the text or id to search
-	 *            the button
+	 *            [0] search button by id or text, [1] the text or id to search the button
 	 * @return response with the status of the command
 	 */
 	private CommandResponse isButtonVisible(String[] arguments) {
@@ -1133,8 +1139,8 @@ public class SoloExecutor {
 	/**
 	 * 
 	 * @param params
-	 *            x and y coordinates to click and whether the the coordinates
-	 *            are relative or absolute
+	 *            x and y coordinates to click and whether the the coordinates are relative or
+	 *            absolute
 	 * @return response with the status of the command
 	 * 
 	 */
@@ -1164,8 +1170,8 @@ public class SoloExecutor {
 	/**
 	 * 
 	 * @param params
-	 *            x and y start coordinates, x and y end coordinates and whether
-	 *            the the coordinates are relative or absolute
+	 *            x and y start coordinates, x and y end coordinates and whether the the coordinates
+	 *            are relative or absolute
 	 * @return response with the status of the command
 	 * 
 	 */
@@ -1174,8 +1180,7 @@ public class SoloExecutor {
 		String command = "the command click on screen: ";
 		CommandResponse result = new CommandResponse();
 		try {
-			command += "(" + params[0] + "," + params[1] + "," + params[2] + "," + params[3] + "," + params[4] + ","
-					+ params[5] + ")";
+			command += "(" + params[0] + "," + params[1] + "," + params[2] + "," + params[3] + "," + params[4] + "," + params[5] + ")";
 			int steps = Integer.parseInt(params[4]);
 			boolean relative = params[5].equals("relative");
 			float x1 = Float.parseFloat(params[0]);
@@ -1220,8 +1225,8 @@ public class SoloExecutor {
 	}
 
 	/**
-	 * NOTE ! THIS METHOD MUST BE THE FIRST COMMAND BEFORE ANY OTHER COMMAND the
-	 * launch method will launch the instrumentation of the application
+	 * NOTE ! THIS METHOD MUST BE THE FIRST COMMAND BEFORE ANY OTHER COMMAND the launch method will
+	 * launch the instrumentation of the application
 	 * 
 	 * @return return status of the operation
 	 */
@@ -1251,6 +1256,7 @@ public class SoloExecutor {
 	private CommandResponse handleException(final String command, Throwable e) {
 		CommandResponse result = new CommandResponse();
 		result.setResponse(command + " failed due to " + e.getMessage());
+		result.setSucceeded(false);
 		Log.e(TAG, result.getResponse());
 		return result;
 	}
@@ -1294,5 +1300,309 @@ public class SoloExecutor {
 			throw new Exception("clickOnView FAILED view: " + view.getClass().getSimpleName() + " is not shown");
 		}
 	}
+
+	// *********************** updating methods
+
+
+	@SuppressLint("NewApi")
+	private CommandResponse closeActivity(String[] params) {
+		try {
+			String activityName = params[0];
+			CommandResponse response = new CommandResponse();
+			response.setOriginalCommand("closeActivity");
+			Activity activity = solo.getCurrentActivity();
+			if (activity.getClass().getSimpleName().equals(activityName)) {
+				activity.finish();
+				int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+				if (currentapiVersion > android.os.Build.VERSION_CODES.JELLY_BEAN) {
+					if (!activity.isDestroyed()) {
+						response.setResponse("Failed to destroy activity " + activityName);
+						response.setSucceeded(false);
+						return response;
+					}
+				}
+			} else {
+				response.setSucceeded(false);
+				response.setResponse("Current activity is " + activity.getClass().getSimpleName() + " while expecting activity " + activityName);
+				return response;
+			}
+			response.setResponse("Activity " + activityName + " was closed");
+			response.setSucceeded(true);
+			return response;
+
+		} catch (Exception e) {
+			return handleException("closeActivity", e);
+		}
+	}
+	
+	
+
+
+	private CommandResponse clickOnMenuItemById(String[] params) {
+		CommandResponse response = new CommandResponse();
+		int itemId = Integer.valueOf(params[0]);			
+		try {
+			response.setOriginalCommand("clickOnMenuItemById");
+			instrumentation.invokeMenuActionSync(solo.getCurrentActivity(), itemId, 0);
+			response.setResponse("Success to invokeMenuActionSync and click on menue item - item id  " + itemId);
+			response.setSucceeded(true);
+		} catch (Throwable e) {
+			response.setResponse("Failed to invokeMenuActionSync and click on menue item - item id  " + itemId);
+			response.setSucceeded(false);
+			return response ;
+		}
+		return response;
+	}
+
+	private CommandResponse closeApplication() {
+		CommandResponse response = new CommandResponse();
+		String command = "the command closeApplication";
+		try {
+			response.setOriginalCommand("closeApplication");
+			Log.i(TAG, "Robotium: About to close application");
+			solo.finishOpenedActivities();
+			
+		} catch (Exception e) {
+			return handleException("Failed to invokeMenuActionSync and click on menue item - item id  ",e);
+		}
+		response.setResponse(command);
+		response.setSucceeded(true);
+		return response;
+	}
+
+	private CommandResponse clickOnViewByIndex(String[] params) {
+		Log.i(TAG, "About to click on view by index");
+		CommandResponse response = new CommandResponse();
+		String command = "the command clickOnViewByIndex";
+		try {
+			response.setOriginalCommand("clickOnViewByIndex");
+			int viewIndex = Integer.valueOf(params[0]);
+			command += "(" + viewIndex + ")";
+			solo.clickOnView(solo.getCurrentViews().get(viewIndex));
+			response.setResponse("sucesse to run " + command);
+			response.setSucceeded(true);
+		} catch (Throwable e) {
+			return handleException("failed to run "  + command, e);
+		}
+		return response ;
+	}
+
+	private CommandResponse scrollLeft() {
+		CommandResponse response = new CommandResponse();
+		String command = "the command Scroll Left";
+		try {
+			Log.i(TAG, "About to scroll Left ");
+			response.setOriginalCommand("scrollLeft");
+			solo.scrollToSide(LEFT);//
+			response.setResponse("sucesse to run " + command);
+			response.setSucceeded(true);
+		} catch (Throwable e) {
+			return handleException("failed to run " + command, e);
+		}
+
+		return response;
+
+	}
+
+	private CommandResponse scrollRight() {
+		CommandResponse response = new CommandResponse();
+		String command = "the command Scroll Right";
+		try {
+			Log.i(TAG, "About to scroll Left ");
+			response.setOriginalCommand("scrollRight");
+			solo.scrollToSide(RIGHT);//
+			response.setResponse("sucesse to run " + command);
+			response.setSucceeded(true);
+		} catch (Throwable e) {
+			return handleException("failed to run " + command, e);
+		}
+
+		return response;
+
+	}
+
+	private CommandResponse scrollUp() {
+		CommandResponse response = new CommandResponse();
+		String command = "the command Scroll Up";
+		try {
+			Log.i(TAG, "About to scroll Up ");
+			response.setOriginalCommand("scrollUp");
+			solo.scrollToSide(UP);//
+			response.setResponse("sucesse to run " + command);
+			response.setSucceeded(true);
+		} catch (Throwable e) {
+			return handleException("failed to run " + command, e);
+		}
+		return response;
+
+	}
+	
+	private CommandResponse scrollDown() {
+		CommandResponse response = new CommandResponse();
+		String command = "the command Scroll Down";
+		try {
+			Log.i(TAG, "About to scroll Down ");
+			response.setOriginalCommand("scrollDown");
+			solo.scrollToSide(DOWN);//
+			response.setResponse("sucesse to run " + command);
+			response.setSucceeded(true);
+		} catch (Throwable e) {
+			return handleException("failed to run " + command, e);
+		}
+		return response;
+
+	}
+
+	
+
+	/**
+	 * This method will click on a radioButton by its index<br>
+	 * 
+	 * @param arguments
+	 * @author eran_g 28.11.12
+	 */
+	private CommandResponse clickOnRadioButton(String[] params) {
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("clickOnRadioButton");
+		try {
+			int radioButtonIndex = Integer.parseInt(params[0]);
+			Log.i(TAG, "Robotium: About to clickOnRadioButton in index: " + radioButtonIndex);
+			int counter = 0;
+			for (View v : solo.getCurrentViews()){
+				if (v instanceof RadioButton){
+					counter++;
+				}
+			}
+			if (radioButtonIndex <= counter) {
+				solo.clickOnRadioButton(radioButtonIndex);
+			} else {
+				throw new Exception("Radion button index is invalid, found " + counter+ " radio buttons and requested index was: " + radioButtonIndex);
+			}
+			response.setSucceeded(true);
+			response.setResponse("Clicked on radio button with index "+radioButtonIndex);
+		} catch (Exception e) {
+			return handleException("Failed to run command "+response.getOriginalCommand(), e);
+		}
+		return response;
+	}
+
+	private CommandResponse clickOnActionBarHomeButton() {
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("clickOnActionBarHomeButton");
+		try {
+			solo.clickOnActionBarHomeButton();
+			response.setResponse("Clicked on action bar home button");
+			response.setSucceeded(true);
+		}catch (Exception e){
+			return handleException("Failed ro eun command "+response.getOriginalCommand(), e);
+		}
+		return response;
+	}
+
+
+	private CommandResponse showMenuOptions() {
+		Log.i(TAG, "Robotium: About to show menu options");
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("the command show menu options");
+		try {
+			solo.sendKey(Solo.MENU);
+			response.setSucceeded(true);
+			response.setResponse("Showed manu options");
+		} catch (Exception e) {
+			return handleException("Failed "+response.getOriginalCommand(), e);
+		}
+		return response;
+	}
+
+	private CommandResponse pull(String[] params) {
+		CommandResponse response = new CommandResponse(); 
+		response.setOriginalCommand("pull");
+		DataInputStream in = null;
+		FileInputStream fstream = null;
+		BufferedReader br = null;
+		try {
+			StringBuilder allText = new StringBuilder();
+			fstream = new FileInputStream(params[0]);
+			// Get the object of DataInputStream
+			in = new DataInputStream(fstream);
+			br = new BufferedReader(new InputStreamReader(in));
+			String line;
+			while ((line = br.readLine()) != null) {
+				allText.append(line);
+			}
+			response.setResponse(allText.toString());
+			response.setSucceeded(true);
+		} catch (Exception e) {
+			return handleException(response.getOriginalCommand(), e);
+		}finally {
+			if (br!=null){
+				try {
+					br.close();
+				} catch (IOException e) {
+					return handleException("Failed closing file", e);
+				}
+			}
+			
+		}
+		return response;
+	}
+
+	@SuppressLint("NewApi")
+	private CommandResponse createFileInServer(String[] params) {
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("createFileInServer");
+		String fileName = params[0];
+		String content = params[1];
+		boolean append = Boolean.parseBoolean(params[2]);
+		FileOutputStream fos = null;
+		FileWriter out = null;
+		try {
+			if (append) {
+				byte[] data = Base64.decode(content, Base64.URL_SAFE);
+				fos = new FileOutputStream(fileName);
+				fos.write(data);
+			} else {
+				out = new FileWriter(fileName);
+				out.write(content);
+			}
+			
+			Log.d(TAG, "run the command:" + response.getOriginalCommand());
+			response.setResponse("Creating file "+fileName);
+		} catch (Exception e) {
+			return handleException("Failed: "+response.getOriginalCommand(), e);
+		}finally {
+			if (fos !=null){
+				try {
+					fos.close();
+				} catch (IOException e) {
+					return handleException("Failed closing file", e);				}
+			}
+			if (out != null){
+				try {
+					out.close();
+				} catch (IOException e) {
+					return handleException("Failed closing file", e);				}
+			}
+		}
+		return response;
+	}
+
+	private CommandResponse setPreferanceCompleteRideCounter() {
+		//update the compte ride parameter in the preferences to be 0  so we won't get any popup for rate the App
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("setPreferanceCompleteRideCounter");
+		long valueOfCounter = 0;
+		try {
+			SharedPreferences sharedPreferences = solo.getCurrentActivity().getApplicationContext().getSharedPreferences(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
+			sharedPreferences.edit().putInt(COMPLETE_ORDERS, 0).commit();
+			valueOfCounter = sharedPreferences.getLong(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
+		} catch (Throwable e) {
+			return handleException("Failed: "+response.getOriginalCommand(), e);
+		}
+		response.setResponse("setPreferanceCompleteRideCounter + value of counter is " + String.valueOf(valueOfCounter));
+		response.setSucceeded(true);
+		return response;
+	}
+
 
 }

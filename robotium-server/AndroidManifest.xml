@@ -10,7 +10,7 @@
 
     <uses-permission android:name="android.permission.RUN_INSTRUMENTATION" />    
     <uses-permission android:name="android.permission.INTERNET"/> 	 
-    <instrumentation android:targetPackage="org.topq.mobile.example.loginapp"
+    <instrumentation android:targetPackage="com.gettaxi.driverbox"
        android:name="il.co.topq.mobile.server.impl.RobotiumExecutor"/> 	       
 
     <application

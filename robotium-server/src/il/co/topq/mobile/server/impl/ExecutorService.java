@@ -48,7 +48,7 @@ public class ExecutorService extends Service {
 		 * starts the tcp server communication with the input port
 		 * @param serverPort the server port
 		 */
-		@Override
+		//@Override
 		public void startServerCommunication(int serverPort) {
 			if (tcpServer == null) {
 				tcpServer = TcpServer.getInstance(serverPort);
