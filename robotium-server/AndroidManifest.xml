@@ -12,6 +12,17 @@
     <uses-permission android:name="android.permission.INTERNET"/> 	 
     <instrumentation android:targetPackage="com.gettaxi.driverbox"
        android:name="il.co.topq.mobile.server.impl.RobotiumExecutor"/> 	       
+       
+        
+    <instrumentation android:targetPackage="com.gettaxi.android"
+       android:name="il.co.topq.mobile.server.impl.RobotiumExecutorApp2"/> 
+    
+    <instrumentation android:targetPackage="com.getatxi"
+       android:name="il.co.topq.mobile.server.impl.RobotiumExecutorApp3"/> 
+       
+       <instrumentation android:targetPackage="com.lexa.fakegps"
+      android:name="il.co.topq.mobile.server.impl.RobotiumExecutorApp4"/>                
+    
 
     <application
         android:debuggable="true"

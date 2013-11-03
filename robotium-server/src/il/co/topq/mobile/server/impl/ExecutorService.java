@@ -24,14 +24,19 @@ public class ExecutorService extends Service {
 	
 	private IExecutorService.Stub apiEndPoint = new IExecutorService.Stub() {		
 		
+		
+		public String getLastExecutorID() {
+			return tcpServer.getLastExecutorID();
+		}
+		
 		/**
 		 * registers a command executor to the service
 		 */
 		@Override
-		public void registerExecutor(IDataCallback executor) {
-			Log.d(TAG,"Registering Executor : "+executor);
+		public void registerExecutor(String executorID,IDataCallback executor) {
+			Log.d(TAG,"Registering Executor : "+executor + " to ID : "+executorID);
 			commandExecutor = executor;
-			tcpServer.registerDataExecutor(commandExecutor);
+			tcpServer.registerDataExecutor(executorID,commandExecutor);
 		}
 		
 		/**
@@ -48,10 +53,11 @@ public class ExecutorService extends Service {
 		 * starts the tcp server communication with the input port
 		 * @param serverPort the server port
 		 */
-		//@Override
+		@Override
 		public void startServerCommunication(int serverPort) {
 			if (tcpServer == null) {
 				tcpServer = TcpServer.getInstance(serverPort);
+				
 				tcpServer.startServerCommunication();
 			}
 			else {

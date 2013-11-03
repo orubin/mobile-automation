@@ -5,8 +5,8 @@ import il.co.topq.mobile.server.interfaces.IInstrumentationLauncher;
 
 interface IExecutorService {
 
-//	String executeCommand(String data);
-	void registerExecutor(IDataCallback executor);
+	void registerExecutor(String executorID,IDataCallback executor);
 	void registerInstrumenationLauncher(IInstrumentationLauncher iInstrumentationLauncher);
 	void startServerCommunication(int serverPort);
+	String getLastExecutorID();
 }

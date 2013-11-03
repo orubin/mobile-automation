@@ -11,6 +11,7 @@ public class CommandRequest {
 	
 	private String command;
 	private String[] params;
+	private String executorID;
 	
 	/**
 	 * DOES NOTHING! Only made for json parsing
@@ -22,7 +23,8 @@ public class CommandRequest {
 	 * @param command the string command
 	 * @param params the parameters of the command
 	 */
-	public CommandRequest(String command,String... params) {
+	public CommandRequest(String executorID,String command,String... params) {
+		this.executorID = executorID;
 		this.command = command;
 		this.params = params;
 	}
@@ -42,5 +44,14 @@ public class CommandRequest {
 	public String[] getParams() {
 		return params;
 	}
+	
+	/**
+	 * will get the executor id
+	 * @return executor id
+	 */
+	public String getExecutorID() {
+		return this.executorID;
+	}
+
 
 }

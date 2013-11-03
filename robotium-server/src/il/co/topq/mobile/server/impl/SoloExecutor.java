@@ -88,6 +88,9 @@ public class SoloExecutor {
 		CommandRequest request = JsonParser.fromJson(data, CommandRequest.class);
 		CommandResponse response = new CommandResponse();
 		// for (CommandParser command : parser.getCommands()) {
+		if (!this.soloProvider.getLastExecutorID().equals(request.getExecutorID())) {
+			this.soloProvider.syncActivity();
+		}
 		String commandStr = request.getCommand();
 		if (commandStr.equals("scrollToEdge")) {
 			response = scrollToEdge(request.getParams());
@@ -1243,6 +1246,8 @@ public class SoloExecutor {
 		}
 		return result;
 	}
+	
+	
 
 	/**
 	 * handle an exception

@@ -28,9 +28,9 @@ import com.jayway.android.robotium.solo.SoloEnhanced;
  * the class is the robotium executor
  * it will get commands from the service and executes them
  */
-public class RobotiumExecutor extends Instrumentation implements ISoloProvider {
+public class RobotiumExecutorApp4 extends Instrumentation implements ISoloProvider {
 	
-	private static final String TAG = "RobotiumExecutor";
+	private static final String TAG = "RobotiumExecutorApp4";
 	private Activity myActive = null;
 	private SoloExecutor executor = null;
 	private String launcherActivityClass;

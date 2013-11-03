@@ -33,7 +33,29 @@ public interface MobileClientInterface {
 	 */
 
 	public abstract CommandResponse launch(String launcherActivityClass) throws Exception;
-
+	
+	/**
+	 * will get the executor id
+	 * @return the executor id
+	 */
+	public String getExecutorID();
+	
+	/**
+ 	* will set the executor id
+ 	* @param executorID the current unique executor id
+ 	*/
+	public void setExecutorID(String executorID);
+	
+	/**
+	 * NOTE ! THIS METHOD MUST BE THE FIRST COMMAND BEFORE ANY OTHER COMMAND
+	 * the launch method will launch the instrumentation of the application
+	 * @param launcherActivityClass the full class name with the package of the main launcher activity
+	 * @param executorFullClassName the full name of the executor class that handles this app 
+	 * @return return status of the operation
+	 * @throws Exception
+	 */
+	public CommandResponse launch(String launcherActivityClass,String executorFullClassName) throws Exception;
+	
 	/**
 	 * will get the text of the input text view index
 	 * 

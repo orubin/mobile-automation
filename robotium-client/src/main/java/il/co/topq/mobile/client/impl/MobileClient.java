@@ -4,6 +4,7 @@ import il.co.topq.mobile.client.interfaces.MobileClientInterface;
 import il.co.topq.mobile.common.client.enums.HardwareButtons;
 import il.co.topq.mobile.common.datamodel.CommandRequest;
 import il.co.topq.mobile.common.datamodel.CommandResponse;
+import il.co.topq.mobile.common.server.consts.TcpConsts;
 import il.co.topq.mobile.common.server.utils.JsonParser;
 import il.co.topq.mobile.tcp.impl.TcpClient;
 
@@ -27,6 +28,7 @@ public class MobileClient implements MobileClientInterface {
 	private TcpClient tcpClient;
 	private int serverPort;
 	private String serverHost;
+	private String executorID;
 
 	public enum Attribute {
 		TEXT, ID;
@@ -48,6 +50,26 @@ public class MobileClient implements MobileClientInterface {
 			logger.error("Exception in constructor !!", e);
 		}
 	}
+	
+
+	/**
+	 * will get a mobile client interface with a connection to the default server parameters
+	 * as localhost:4321 server
+	 * @return an interface of the mobile client
+	 */
+	public static MobileClientInterface getInstance(){
+		return new MobileClient(TcpConsts.SERVER_DEFAULT_HOSTNAME,TcpConsts.SERVER_DEFAULT_PORT);
+	}
+	
+	/**
+	 * will get a mobile client interface with a connection to the input server parameters
+	 * @param serverHost the server ip
+	 * @param serverPort the server port
+	 * @return an interface of the mobile client
+	 */
+	public static MobileClientInterface getInstance(String serverHost,int serverPort){
+		return new MobileClient(serverHost,serverPort);
+	}
 
 	/**
 	 * send data wrapper of the input command and text into a proper command object
@@ -61,7 +83,7 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse sendData(String command, String... params) throws Exception {
 		CommandResponse result = null;
 		try {
-			result = sendDataAndGetJSonObj(new CommandRequest(command, params));
+			result = sendDataAndGetJSonObj(new CommandRequest(this.executorID ,command, params));
 		} catch (Exception e) {
 			logger.error("Failed to send / receive data", e);
 			throw e;
@@ -672,6 +694,12 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse launch() throws Exception {
 		return sendData("launch");
 	}
+	@Override
+    public CommandResponse launch(String launcherActivityClass,String executorFullClassName) throws Exception {
+        return sendData("launch",launcherActivityClass,executorFullClassName);
+    }
+
+
 
 	public CommandResponse isButtonVisible(Attribute attribute, String value) throws Exception {
 		return sendData("isButtonVisible", attribute.name(), value);
@@ -681,4 +709,11 @@ public class MobileClient implements MobileClientInterface {
 		return sendData("setText", text);
 	}
 
+	public String getExecutorID() {
+		return this.executorID;
+	}
+
+	public void setExecutorID(String executorID) {
+		this.executorID = executorID;
+	}
 }
