@@ -5,16 +5,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 
 /**
- * @author limor bortman, tal ben shabtay
- * this class is a standard TCP client connection
+ * @author limor bortman, tal ben shabtay this class is a standard TCP client
+ *         connection
  */
 public class TcpClient {
-	
+
+	private static final int WAIT_FOR_RESPONSE_TIMEOUT = 60000;
 	private static Logger logger = Logger.getLogger(TcpClient.class);
 	private String lastResult;
 	private final String host;
@@ -22,8 +24,11 @@ public class TcpClient {
 
 	/**
 	 * this CTRO will init the params of the server
-	 * @param host the server ip
-	 * @param port the server port
+	 * 
+	 * @param host
+	 *            the server ip
+	 * @param port
+	 *            the server port
 	 * @throws Exception
 	 */
 	public TcpClient(String host, int port) throws Exception {
@@ -33,7 +38,9 @@ public class TcpClient {
 
 	/**
 	 * will send the input string to the server
-	 * @param data the string to send to the server
+	 * 
+	 * @param data
+	 *            the string to send to the server
 	 * @return response from the server
 	 */
 	public String sendData(String data) {
@@ -41,23 +48,22 @@ public class TcpClient {
 		BufferedReader input = null;
 		try {
 			socket = new Socket(this.host, this.port);
+			socket.setSoTimeout(WAIT_FOR_RESPONSE_TIMEOUT);
 			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			PrintWriter output = new PrintWriter(socket.getOutputStream());
 			output.println(data);
 			output.flush();
 			this.lastResult = input.readLine();
-		} 
-		catch (UnknownHostException e) {
+		} catch (SocketTimeoutException se) {
+			logger.error("Time out reached while waiting for server to response ");
+			se.printStackTrace();
+		} catch (UnknownHostException e) {
 			logger.error("Uknown host ");
 			e.printStackTrace();
-			return null;
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			logger.error("Failed sending data due to ", e);
 			e.printStackTrace();
-			return null;
-		} 
-		finally {
+		} finally {
 			try {
 				if (input != null) {
 					input.close();
@@ -65,8 +71,7 @@ public class TcpClient {
 				if (socket != null) {
 					socket.close();
 				}
-			} 
-			catch (Exception e) {
+			} catch (Exception e) {
 				logger.error("Failed closing resources due to ", e);
 			}
 		}
@@ -75,6 +80,7 @@ public class TcpClient {
 
 	/**
 	 * will get the last response from the server
+	 * 
 	 * @return the last response that server sent
 	 * @throws IOException
 	 */
