@@ -97,63 +97,63 @@ public abstract class AbstractAndroidDevice {
 		}
 	}
 	
-	public void launchActivity(String packageName, String activityName, String deviceSerial , String host , String user , String password) throws Exception{
-		WindowsDefaultCliConnection windowsConsole = new WindowsDefaultCliConnection(host, user, password);// not good 
-		if (device.getState() == IDevice.DeviceState.ONLINE) {
-			logger.info("call adb Command to bring another activity to the front activity name : " + activityName + " Main Packege" + packageName + " \n");
-			if (deviceSerial == null) {
-				logger.info("Failed to set into front the requested activity , MobileCliConnection is not initialized");
-				throw new Exception("Failed to set into front the requested activity, MobileCliConnection is not initialized");
-			} else if ((activityName != null && !activityName.isEmpty()) && (packageName != null && !packageName.isEmpty())) {
-				try {
-//					"adb shell am start -a android.intent.action.MAIN -n com.getatxi/.MainActivity --activity-brought-to-front"
-					if (activityName.contains("DriverLoginActivity")){
-						packageName="com.gettaxi.driverbox";
-						activityName= "activity.DriverLoginActivity";
-					}
-//					adb -s 0146B5040F00A012 shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity");
-					CliCommand cmd = new CliCommand("adb -s " + deviceSerial  + " shell am start -a android.intent.action.MAIN -n "+ packageName +"/."  + activityName);//+ " --activity-brought-to-front" + " \n"
-					windowsConsole.handleCliCommand("activity-brought-to-front activity name : cmd String is : " + cmd.getCommands()[0], cmd);
-				} catch (Exception e) {
-					logger.info("Failed to set the Real Device activity into front  : " + e.getMessage());
-					throw e;
-				}
-			} else {
-				logger.info("Failed to set Device activity name , packge name  values are illegal");
-				throw new Exception("Failed to set Device activity name , packge name  values are illegal");
-			}
-			//*************************since it is not working for 2 devices 
-//			 adb -s 0146B5040F00A012 shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity
-//			adb -s 0146B5040F00A012 shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity");
-//			final String command = String.format("adb -s %s shell am start -a android.intent.action.MAIN -n %s/.%s", deviceSerial, packageName,activityName);// 
-//			//"adb shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity";
-//				device.executeShellCommand(command,new IShellOutputReceiver() {
-//					
-//					@Override
-//					public boolean isCancelled() {
-//						// TODO Auto-generated method stub
-//						return false;
+//	public void launchActivity(String packageName, String activityName, String deviceSerial , String host , String user , String password) throws Exception{
+//		WindowsDefaultCliConnection windowsConsole = new WindowsDefaultCliConnection(host, user, password);// not good 
+//		if (device.getState() == IDevice.DeviceState.ONLINE) {
+//			logger.info("call adb Command to bring another activity to the front activity name : " + activityName + " Main Packege" + packageName + " \n");
+//			if (deviceSerial == null) {
+//				logger.info("Failed to set into front the requested activity , MobileCliConnection is not initialized");
+//				throw new Exception("Failed to set into front the requested activity, MobileCliConnection is not initialized");
+//			} else if ((activityName != null && !activityName.isEmpty()) && (packageName != null && !packageName.isEmpty())) {
+//				try {
+////					"adb shell am start -a android.intent.action.MAIN -n com.getatxi/.MainActivity --activity-brought-to-front"
+//					if (activityName.contains("DriverLoginActivity")){
+//						packageName="com.gettaxi.driverbox";
+//						activityName= "activity.DriverLoginActivity";
 //					}
-//					
-//					@Override
-//					public void flush() {
-//						// TODO Auto-generated method stub
-//						
-//					}
-//					
-//					@Override
-//					public void addOutput(byte[] data, int offset, int length) {
-//						// TODO Auto-generated method stub
-//						
-//					}
-//				});
-		} else {
-			Exception e = new Exception("Unable to launch activity - " + activityName+". Device is offline");
-			logger.error(e);
-			throw e;
-		}
-	}
-
+////					adb -s 0146B5040F00A012 shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity");
+//					CliCommand cmd = new CliCommand("adb -s " + deviceSerial  + " shell am start -a android.intent.action.MAIN -n "+ packageName +"/."  + activityName);//+ " --activity-brought-to-front" + " \n"
+//					windowsConsole.handleCliCommand("activity-brought-to-front activity name : cmd String is : " + cmd.getCommands()[0], cmd);
+//				} catch (Exception e) {
+//					logger.info("Failed to set the Real Device activity into front  : " + e.getMessage());
+//					throw e;
+//				}
+//			} else {
+//				logger.info("Failed to set Device activity name , packge name  values are illegal");
+//				throw new Exception("Failed to set Device activity name , packge name  values are illegal");
+//			}
+//			//*************************since it is not working for 2 devices 
+////			 adb -s 0146B5040F00A012 shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity
+////			adb -s 0146B5040F00A012 shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity");
+////			final String command = String.format("adb -s %s shell am start -a android.intent.action.MAIN -n %s/.%s", deviceSerial, packageName,activityName);// 
+////			//"adb shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity";
+////				device.executeShellCommand(command,new IShellOutputReceiver() {
+////					
+////					@Override
+////					public boolean isCancelled() {
+////						// TODO Auto-generated method stub
+////						return false;
+////					}
+////					
+////					@Override
+////					public void flush() {
+////						// TODO Auto-generated method stub
+////						
+////					}
+////					
+////					@Override
+////					public void addOutput(byte[] data, int offset, int length) {
+////						// TODO Auto-generated method stub
+////						
+////					}
+////				});
+//		} else {
+//			Exception e = new Exception("Unable to launch activity - " + activityName+". Device is offline");
+//			logger.error(e);
+//			throw e;
+//		}
+//	}
+//
 	/**
 	 * Captures device screenshot
 	 * 

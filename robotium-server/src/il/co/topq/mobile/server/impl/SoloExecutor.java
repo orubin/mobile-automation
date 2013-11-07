@@ -1240,7 +1240,7 @@ public class SoloExecutor {
 	private CommandResponse setText(String[] params) {
 		String command = "the command  setText";
 		CommandResponse result = new CommandResponse();
-		command += "(" + params[0] + "," + params[1] + ")";
+		command += "(" + params[0] + ")";
 		try {
 			String text = params[0].toString();
 			Log.i(TAG, "About to set text: " + text);
@@ -1807,7 +1807,20 @@ public class SoloExecutor {
 			Intent intent = new Intent("com.gettaxi.android.OPEN_URL");
 			intent.putExtra("DATA", server);
 			// TODO: Assert that the last activity is not null and handle the exeception
-			solo.getActivityMonitor().getLastActivity().sendBroadcast(intent);
+			Activity lastActivity = solo.getActivityMonitor().getLastActivity();
+			if (lastActivity == null || lastActivity.isFinishing()) {
+				solo.getCurrentActivity();
+				if (lastActivity == null || lastActivity.isFinishing()) {				
+					response.setResponse("set the server enviroment to run with server : " + server + "   can't get last activity , the returned value is  : "+ lastActivity );
+					response.setSucceeded(false);
+				} else{
+					lastActivity.sendBroadcast(intent);
+				}
+				return response;
+			} else {
+				lastActivity.sendBroadcast(intent);
+			}
+
 		} catch (Throwable e) {
 			return handleException("Failed: " + response.getOriginalCommand(), e);
 		}
