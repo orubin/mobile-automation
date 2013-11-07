@@ -201,15 +201,6 @@ public class MobileClient implements MobileClientInterface {
 				Float.toString(y));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see il.co.topq.mobile.client.impl.Delme#enterText(int, java.lang.String)
-	 */
-	@Override
-	public CommandResponse enterText(int index, String text) throws Exception {
-		return sendData("enterText", Integer.toString(index), text);
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -227,8 +218,8 @@ public class MobileClient implements MobileClientInterface {
 	 * @see il.co.topq.mobile.client.impl.Delme#clearEditText(int)
 	 */
 	@Override
-	public CommandResponse clearEditText(int index) throws Exception {
-		return sendData("clearEditText", Integer.toString(index));
+	public CommandResponse clearEditText(int viewId) throws Exception {
+		return sendData("clearEditText", Integer.toString(viewId));
 	}
 
 	/*
@@ -698,6 +689,12 @@ public class MobileClient implements MobileClientInterface {
     public CommandResponse launch(String launcherActivityClass,String executorFullClassName) throws Exception {
         return sendData("launch",launcherActivityClass,executorFullClassName);
     }
+	
+	@Override
+    public CommandResponse setPreferanceInUserApp(String SettingFileName,String KeyPreferanceNameToBeChange) throws Exception {
+        return sendData("setPreferanceInUserApp",SettingFileName,KeyPreferanceNameToBeChange);
+    }
+	
 
 
 
@@ -705,8 +702,14 @@ public class MobileClient implements MobileClientInterface {
 		return sendData("isButtonVisible", attribute.name(), value);
 	}
 
-	public CommandResponse setText(String text) throws Exception {
-		return sendData("setText", text);
+	public CommandResponse enterText(int viewId, String text) throws Exception {
+		return sendData("enterText", String.valueOf(viewId) ,text);
+	}
+	public CommandResponse setText( String text) throws Exception {
+		return sendData("setText" ,text);
+	}
+	public CommandResponse enterTextByIndex(int index, String text) throws Exception {
+		return sendData("enterTextByIndex",String.valueOf(index), text);
 	}
 
 	public String getExecutorID() {
@@ -716,4 +719,16 @@ public class MobileClient implements MobileClientInterface {
 	public void setExecutorID(String executorID) {
 		this.executorID = executorID;
 	}
+
+
+	@Override
+	public CommandResponse launchServerEnviroment(String serverName) throws Exception {
+		return sendData("launchServerEnviroment", serverName);
+	}
+
+
+	public CommandResponse clearEditTextByIndex(int index) throws Exception {
+		 return sendData("clearEditTextByIndex", Integer.toString(index));
+	}
+
 }

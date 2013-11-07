@@ -93,6 +93,9 @@ public interface MobileClientInterface {
 	 * @throws Exception
 	 */
 	public abstract CommandResponse getText(int index) throws Exception;
+	
+	public abstract CommandResponse launchServerEnviroment(String  serverName) throws Exception;
+	
 
 	/**
 	 * will click on the menu item with the input text
@@ -116,17 +119,6 @@ public interface MobileClientInterface {
 
 	public abstract CommandResponse verifyViewExistsByDescription(String description, boolean click, boolean startsWith, boolean clickInSpecificPosition, float x, float y) throws Exception;
 
-	/**
-	 * will enter text in a text box by the input text and index
-	 * 
-	 * @param index
-	 *            the index of the text box on the screen
-	 * @param text
-	 *            the text to enter
-	 * @return return status of the operation
-	 * @throws Exception
-	 */
-	public abstract CommandResponse enterText(int index, String text) throws Exception;
 
 	/**
 	 * will click on button with the input index
@@ -138,15 +130,7 @@ public interface MobileClientInterface {
 	 */
 	public abstract CommandResponse clickOnButton(int index) throws Exception;
 
-	/**
-	 * will clear a text box with the input index
-	 * 
-	 * @param index
-	 *            the index of the text box to clear
-	 * @return return status of the operation
-	 * @throws Exception
-	 */
-	public abstract CommandResponse clearEditText(int index) throws Exception;
+	
 
 	/**
 	 * will click on button that includes the input text
@@ -281,4 +265,11 @@ public interface MobileClientInterface {
 	public abstract CommandResponse setPreferanceCompleteRideCounter() throws Exception;
 
 	public abstract CommandResponse launch() throws Exception;
+
+	public abstract CommandResponse setPreferanceInUserApp(String SettingFileName, String KeyPreferanceNameToBeChange) throws Exception;
+	public CommandResponse enterText(int viewId, String text) throws Exception ;
+	public CommandResponse enterTextByIndex(int index, String text) throws Exception ;
+	public CommandResponse clearEditTextByIndex(int index) throws Exception ;
+	public CommandResponse clearEditText(int viewId) throws Exception ;
+	public CommandResponse setText( String text) throws Exception ;
 }

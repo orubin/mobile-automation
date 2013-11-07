@@ -16,9 +16,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-
+import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -34,6 +34,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -45,19 +46,96 @@ import com.jayway.android.robotium.solo.SoloEnhanced;
  * @author tal ben shabtay,limor bortman executes the client command with the solo interface
  */
 public class SoloExecutor {
-	
+
 	private static final String COMPLETE_ORDERS = "COMPLETE_ORDERS";
 	private static final String SETTINGS_FILE_NAME = "app_pref.dat";
 	private static final String TAG = "SoloExecutor";
 	private Instrumentation instrumentation;
 	private Solo solo;
 	private final ISoloProvider soloProvider;
-	private static final int RIGHT=22;
-	private static final int LEFT=21;
-	private static final int DOWN=19;
-	private static final int UP=19;
-	
-	
+	private static final int RIGHT = 22;
+	private static final int LEFT = 21;
+	private static final int DOWN = 19;
+	private static final int UP = 19;
+	private Map<Character, Integer> keys;
+
+	/**
+	 * http://developer.android.com/reference/android/view/KeyEvent.html
+	 */
+	private void initializeKeyMap() {
+		keys = new HashMap<Character, Integer>();
+		keys.put('A', KeyEvent.KEYCODE_A);
+		keys.put('B', KeyEvent.KEYCODE_B);
+		keys.put('C', KeyEvent.KEYCODE_C);
+		keys.put('D', KeyEvent.KEYCODE_D);
+		keys.put('E', KeyEvent.KEYCODE_E);
+		keys.put('F', KeyEvent.KEYCODE_F);
+		keys.put('G', KeyEvent.KEYCODE_G);
+		keys.put('H', KeyEvent.KEYCODE_H);
+		keys.put('I', KeyEvent.KEYCODE_I);
+		keys.put('J', KeyEvent.KEYCODE_J);
+		keys.put('K', KeyEvent.KEYCODE_K);
+		keys.put('L', KeyEvent.KEYCODE_L);
+		keys.put('M', KeyEvent.KEYCODE_M);
+		keys.put('N', KeyEvent.KEYCODE_N);
+		keys.put('O', KeyEvent.KEYCODE_O);
+		keys.put('P', KeyEvent.KEYCODE_P);
+		keys.put('Q', KeyEvent.KEYCODE_Q);
+		keys.put('R', KeyEvent.KEYCODE_R);
+		keys.put('S', KeyEvent.KEYCODE_S);
+		keys.put('T', KeyEvent.KEYCODE_T);
+		keys.put('U', KeyEvent.KEYCODE_U);
+		keys.put('V', KeyEvent.KEYCODE_V);
+		keys.put('W', KeyEvent.KEYCODE_W);
+		keys.put('X', KeyEvent.KEYCODE_X);
+		keys.put('Y', KeyEvent.KEYCODE_Y);
+		keys.put('Z', KeyEvent.KEYCODE_Z);
+
+		keys.put('a', KeyEvent.KEYCODE_A);
+		keys.put('b', KeyEvent.KEYCODE_B);
+		keys.put('c', KeyEvent.KEYCODE_C);
+		keys.put('d', KeyEvent.KEYCODE_D);
+		keys.put('e', KeyEvent.KEYCODE_E);
+		keys.put('f', KeyEvent.KEYCODE_F);
+		keys.put('g', KeyEvent.KEYCODE_G);
+		keys.put('h', KeyEvent.KEYCODE_H);
+		keys.put('i', KeyEvent.KEYCODE_I);
+		keys.put('j', KeyEvent.KEYCODE_J);
+		keys.put('k', KeyEvent.KEYCODE_K);
+		keys.put('l', KeyEvent.KEYCODE_L);
+		keys.put('m', KeyEvent.KEYCODE_M);
+		keys.put('n', KeyEvent.KEYCODE_N);
+		keys.put('o', KeyEvent.KEYCODE_O);
+		keys.put('p', KeyEvent.KEYCODE_P);
+		keys.put('q', KeyEvent.KEYCODE_Q);
+		keys.put('r', KeyEvent.KEYCODE_R);
+		keys.put('s', KeyEvent.KEYCODE_S);
+		keys.put('t', KeyEvent.KEYCODE_T);
+		keys.put('u', KeyEvent.KEYCODE_U);
+		keys.put('v', KeyEvent.KEYCODE_V);
+		keys.put('w', KeyEvent.KEYCODE_W);
+		keys.put('x', KeyEvent.KEYCODE_X);
+		keys.put('y', KeyEvent.KEYCODE_Y);
+		keys.put('z', KeyEvent.KEYCODE_Z);
+
+		keys.put('1', KeyEvent.KEYCODE_1);
+		keys.put('2', KeyEvent.KEYCODE_2);
+		keys.put('3', KeyEvent.KEYCODE_3);
+		keys.put('4', KeyEvent.KEYCODE_4);
+		keys.put('5', KeyEvent.KEYCODE_5);
+		keys.put('6', KeyEvent.KEYCODE_6);
+		keys.put('7', KeyEvent.KEYCODE_7);
+		keys.put('8', KeyEvent.KEYCODE_8);
+		keys.put('9', KeyEvent.KEYCODE_9);
+		keys.put('0', KeyEvent.KEYCODE_0);
+		keys.put(',', KeyEvent.KEYCODE_COMMA);
+
+		keys.put('@', KeyEvent.KEYCODE_AT);
+		keys.put('.', KeyEvent.KEYCODE_PERIOD);
+		keys.put(' ', KeyEvent.KEYCODE_SPACE);
+		keys.put('*', KeyEvent.KEYCODE_ENTER);// for Next or done
+
+	}
 
 	/**
 	 * creates a solo executor
@@ -122,6 +200,10 @@ public class SoloExecutor {
 			response = swipeLeft(request.getParams());
 		} else if (commandStr.equals("enterText")) {
 			response = enterText(request.getParams());
+		} else if (commandStr.equals("setText")) {
+			response = setText(request.getParams());
+		} else if (commandStr.equals("enterTextByIndex")) {
+			response = enterTextByIndex(request.getParams());
 		} else if (commandStr.equals("isButtonVisible")) {
 			response = isButtonVisible(request.getParams());
 		} else if (commandStr.equals("clickInControlByIndex")) {
@@ -136,6 +218,8 @@ public class SoloExecutor {
 			response = launch();
 		} else if (commandStr.equals("clearEditText")) {
 			response = clearEditText(request.getParams());
+		} else if (commandStr.equals("clearEditTextByIndex")) {
+			response = clearEditTextByIndex(request.getParams());
 		} else if (commandStr.equals("clickOnButtonWithText")) {
 			response = clickOnButtonWithText(request.getParams());
 		} else if (commandStr.equals("clickOnView")) {
@@ -174,34 +258,39 @@ public class SoloExecutor {
 			response = getAllVisibleIds();
 		} else if (commandStr.equals("click")) {
 			response = click(request.getParams());
-		}else if (commandStr.equals("closeActivity")) {
+		} else if (commandStr.equals("closeActivity")) {
 			response = closeActivity(request.getParams());
-		}else if (commandStr.equals("clickOnMenuItemById")) {
+		} else if (commandStr.equals("clickOnMenuItemById")) {
 			response = clickOnMenuItemById(request.getParams());
-		}else if (commandStr.equals("closeApplication")) {
+		} else if (commandStr.equals("closeApplication")) {
 			response = closeApplication();
-		}else if (commandStr.equals("clickOnViewByIndex")) {
+		} else if (commandStr.equals("clickOnViewByIndex")) {
 			response = clickOnViewByIndex(request.getParams());
-		}else if (commandStr.equals("scrollLeft")) {
+		} else if (commandStr.equals("scrollLeft")) {
 			response = scrollLeft();
-		}else if (commandStr.equals("scrollRight")) {
+		} else if (commandStr.equals("scrollRight")) {
 			response = scrollRight();
-		}else if (commandStr.equals("scrollUp")) {
+		} else if (commandStr.equals("scrollUp")) {
 			response = scrollUp();
-		}else if (commandStr.equals("scrollDown")) {
+		} else if (commandStr.equals("scrollDown")) {
 			response = scrollDown();
-		}else if (commandStr.equals("clickOnRadioButton")) {
+		} else if (commandStr.equals("clickOnRadioButton")) {
 			response = clickOnRadioButton(request.getParams());
-		}else if (commandStr.equals("clickOnActionBarHomeButton")) {
+		} else if (commandStr.equals("clickOnActionBarHomeButton")) {
 			response = clickOnActionBarHomeButton();
-		}else if (commandStr.equals("showMenuOptions")) {
+		} else if (commandStr.equals("showMenuOptions")) {
 			response = showMenuOptions();
-		}else if (commandStr.equals("pull")) {
+		} else if (commandStr.equals("pull")) {
 			response = pull(request.getParams());
-		}else if (commandStr.equals("push")) {
+		} else if (commandStr.equals("push")) {
 			response = createFileInServer(request.getParams());
-		}else if (commandStr.equals("setPreferanceCompleteRideCounter")) {
+		} else if (commandStr.equals("setPreferanceCompleteRideCounter")) {
 			response = setPreferanceCompleteRideCounter();
+		} else if (commandStr.equals("setPreferanceInUserApp")) {
+			response = setPreferanceInUserApp(request.getParams());
+		} else if (commandStr.equals("launchServerEnviroment")) {
+			response = launchServerEnviroment(request.getParams());
+
 		}
 		response.setOriginalCommand(request.getCommand());
 		response.setParams(request.getParams());
@@ -282,6 +371,7 @@ public class SoloExecutor {
 		try {
 			if (params.length == 2) {
 				result.setSucceeded(solo.waitForActivity(params[0], Integer.parseInt(params[1])));
+
 			} else if (params.length == 1) {
 				result.setSucceeded(solo.waitForActivity(params[0]));
 			}
@@ -315,8 +405,8 @@ public class SoloExecutor {
 				result.setResponse(command + ",Response: failed to get the activity name");
 				result.setSucceeded(false);
 			} else {
-				result.setOriginalCommand(command + ", Response: Activity name is: " +response);
-				result.setResponse(response); //command + ", Response: Activity name is: " +
+				result.setOriginalCommand(command + ", Response: Activity name is: " + response);
+				result.setResponse(response); // command + ", Response: Activity name is: " +
 				result.setSucceeded(true);
 			}
 		} catch (Throwable e) {
@@ -557,7 +647,6 @@ public class SoloExecutor {
 		return result;
 	}
 
-
 	/**
 	 * gets the text of all the current text views
 	 * 
@@ -645,7 +734,7 @@ public class SoloExecutor {
 			command += "(" + arguments[0] + ")";
 			response = solo.getText(Integer.parseInt(arguments[0])).getText().toString();
 			result.setOriginalCommand(command + ",Response: " + response);
-			result.setResponse( response);
+			result.setResponse(response);
 			result.setSucceeded(true);
 		} catch (Throwable e) {
 			result = handleException(command, e);
@@ -975,7 +1064,7 @@ public class SoloExecutor {
 	 *            the id of the text box to clear
 	 * @return response with the status of the command
 	 */
-	private CommandResponse clearEditText(String[] arguments) {
+	private CommandResponse clearEditTextByIndex(String[] arguments) {
 		String command = "the command  clearEditText";
 		CommandResponse result = new CommandResponse();
 		try {
@@ -983,6 +1072,33 @@ public class SoloExecutor {
 			this.solo.clearEditText(Integer.parseInt(arguments[0]));
 			result.setResponse(command);
 			result.setSucceeded(true);
+		} catch (Throwable e) {
+			result = handleException(command, e);
+		}
+		return result;
+	}
+
+	/**
+	 * clears the text box
+	 * 
+	 * @param arguments
+	 *            the id of the text box to clear
+	 * @return response with the status of the command
+	 */
+	private CommandResponse clearEditText(String[] arguments) {
+		String command = "the command  clearEditText";
+		CommandResponse result = new CommandResponse();
+		try {
+			command += "(" + arguments[0] + ")";
+			final View view = solo.getView(Integer.parseInt(arguments[0]));
+			if (view instanceof EditText) {
+				this.solo.clearEditText((EditText) view);
+				result.setResponse(command);
+				result.setSucceeded(true);
+			} else {
+				result.setSucceeded(false);
+				result.setResponse("View is instance of " + view.getClass().getSimpleName() + " instead of EditText");
+			}
 		} catch (Throwable e) {
 			result = handleException(command, e);
 		}
@@ -1090,7 +1206,66 @@ public class SoloExecutor {
 	 *            [0] the id of the text box , [1] the text to enter
 	 * @return response with the status of the command
 	 */
+
 	private CommandResponse enterText(String[] params) {
+		String command = "the command  enterText";
+		CommandResponse result = new CommandResponse();
+		try {
+			command += "(" + params[0] + "," + params[1] + ")";
+			final View view = solo.getView(Integer.parseInt(params[0]));
+			if (view instanceof EditText) {
+				this.solo.enterText((EditText) view, params[1]);
+				result.setResponse(command);
+				result.setSucceeded(true);
+			} else {
+
+				result.setResponse("try to enter text in text view - View is instance of " + view.getClass().getSimpleName() + " instead of EditText");
+				result.setSucceeded(false);
+			}
+		} catch (Throwable e) {
+			result = handleException(command, e);
+		}
+		return result;
+
+	}
+
+	/**
+	 * enter text to the input text box id with the input text
+	 * 
+	 * @param params
+	 *            [0] the id of the text box , [1] the text to enter
+	 * @return response with the status of the command
+	 */
+
+	private CommandResponse setText(String[] params) {
+		String command = "the command  setText";
+		CommandResponse result = new CommandResponse();
+		command += "(" + params[0] + "," + params[1] + ")";
+		try {
+			String text = params[0].toString();
+			Log.i(TAG, "About to set text: " + text);
+			command += "(text: " + text + ")";
+			for (Character c : text.toCharArray()) {
+				instrumentation.sendKeyDownUpSync(keys.get(c));
+			}
+			result.setResponse(command);
+			result.setSucceeded(true);
+
+		} catch (Throwable e) {
+			result = handleException(command, e);
+		}
+		return result;
+	}
+
+	/**
+	 * enter text to the input text box id with the input text
+	 * 
+	 * @param params
+	 *            [0] the id of the text box , [1] the text to enter
+	 * @return response with the status of the command
+	 */
+
+	private CommandResponse enterTextByIndex(String[] params) {
 		String command = "the command  enterText";
 		CommandResponse result = new CommandResponse();
 		try {
@@ -1246,8 +1421,6 @@ public class SoloExecutor {
 		}
 		return result;
 	}
-	
-	
 
 	/**
 	 * handle an exception
@@ -1308,7 +1481,6 @@ public class SoloExecutor {
 
 	// *********************** updating methods
 
-
 	@SuppressLint("NewApi")
 	private CommandResponse closeActivity(String[] params) {
 		try {
@@ -1339,13 +1511,10 @@ public class SoloExecutor {
 			return handleException("closeActivity", e);
 		}
 	}
-	
-	
-
 
 	private CommandResponse clickOnMenuItemById(String[] params) {
 		CommandResponse response = new CommandResponse();
-		int itemId = Integer.valueOf(params[0]);			
+		int itemId = Integer.valueOf(params[0]);
 		try {
 			response.setOriginalCommand("clickOnMenuItemById");
 			instrumentation.invokeMenuActionSync(solo.getCurrentActivity(), itemId, 0);
@@ -1354,7 +1523,7 @@ public class SoloExecutor {
 		} catch (Throwable e) {
 			response.setResponse("Failed to invokeMenuActionSync and click on menue item - item id  " + itemId);
 			response.setSucceeded(false);
-			return response ;
+			return response;
 		}
 		return response;
 	}
@@ -1366,9 +1535,9 @@ public class SoloExecutor {
 			response.setOriginalCommand("closeApplication");
 			Log.i(TAG, "Robotium: About to close application");
 			solo.finishOpenedActivities();
-			
+
 		} catch (Exception e) {
-			return handleException("Failed to invokeMenuActionSync and click on menue item - item id  ",e);
+			return handleException("Failed to invokeMenuActionSync and click on menue item - item id  ", e);
 		}
 		response.setResponse(command);
 		response.setSucceeded(true);
@@ -1387,9 +1556,9 @@ public class SoloExecutor {
 			response.setResponse("sucesse to run " + command);
 			response.setSucceeded(true);
 		} catch (Throwable e) {
-			return handleException("failed to run "  + command, e);
+			return handleException("failed to run " + command, e);
 		}
-		return response ;
+		return response;
 	}
 
 	private CommandResponse scrollLeft() {
@@ -1441,7 +1610,7 @@ public class SoloExecutor {
 		return response;
 
 	}
-	
+
 	private CommandResponse scrollDown() {
 		CommandResponse response = new CommandResponse();
 		String command = "the command Scroll Down";
@@ -1458,8 +1627,6 @@ public class SoloExecutor {
 
 	}
 
-	
-
 	/**
 	 * This method will click on a radioButton by its index<br>
 	 * 
@@ -1473,20 +1640,20 @@ public class SoloExecutor {
 			int radioButtonIndex = Integer.parseInt(params[0]);
 			Log.i(TAG, "Robotium: About to clickOnRadioButton in index: " + radioButtonIndex);
 			int counter = 0;
-			for (View v : solo.getCurrentViews()){
-				if (v instanceof RadioButton){
+			for (View v : solo.getCurrentViews()) {
+				if (v instanceof RadioButton) {
 					counter++;
 				}
 			}
 			if (radioButtonIndex <= counter) {
 				solo.clickOnRadioButton(radioButtonIndex);
 			} else {
-				throw new Exception("Radion button index is invalid, found " + counter+ " radio buttons and requested index was: " + radioButtonIndex);
+				throw new Exception("Radion button index is invalid, found " + counter + " radio buttons and requested index was: " + radioButtonIndex);
 			}
 			response.setSucceeded(true);
-			response.setResponse("Clicked on radio button with index "+radioButtonIndex);
+			response.setResponse("Clicked on radio button with index " + radioButtonIndex);
 		} catch (Exception e) {
-			return handleException("Failed to run command "+response.getOriginalCommand(), e);
+			return handleException("Failed to run command " + response.getOriginalCommand(), e);
 		}
 		return response;
 	}
@@ -1498,12 +1665,11 @@ public class SoloExecutor {
 			solo.clickOnActionBarHomeButton();
 			response.setResponse("Clicked on action bar home button");
 			response.setSucceeded(true);
-		}catch (Exception e){
-			return handleException("Failed ro eun command "+response.getOriginalCommand(), e);
+		} catch (Exception e) {
+			return handleException("Failed ro eun command " + response.getOriginalCommand(), e);
 		}
 		return response;
 	}
-
 
 	private CommandResponse showMenuOptions() {
 		Log.i(TAG, "Robotium: About to show menu options");
@@ -1514,13 +1680,13 @@ public class SoloExecutor {
 			response.setSucceeded(true);
 			response.setResponse("Showed manu options");
 		} catch (Exception e) {
-			return handleException("Failed "+response.getOriginalCommand(), e);
+			return handleException("Failed " + response.getOriginalCommand(), e);
 		}
 		return response;
 	}
 
 	private CommandResponse pull(String[] params) {
-		CommandResponse response = new CommandResponse(); 
+		CommandResponse response = new CommandResponse();
 		response.setOriginalCommand("pull");
 		DataInputStream in = null;
 		FileInputStream fstream = null;
@@ -1539,15 +1705,15 @@ public class SoloExecutor {
 			response.setSucceeded(true);
 		} catch (Exception e) {
 			return handleException(response.getOriginalCommand(), e);
-		}finally {
-			if (br!=null){
+		} finally {
+			if (br != null) {
 				try {
 					br.close();
 				} catch (IOException e) {
 					return handleException("Failed closing file", e);
 				}
 			}
-			
+
 		}
 		return response;
 	}
@@ -1570,30 +1736,33 @@ public class SoloExecutor {
 				out = new FileWriter(fileName);
 				out.write(content);
 			}
-			
+
 			Log.d(TAG, "run the command:" + response.getOriginalCommand());
-			response.setResponse("Creating file "+fileName);
+			response.setResponse("Creating file " + fileName);
 		} catch (Exception e) {
-			return handleException("Failed: "+response.getOriginalCommand(), e);
-		}finally {
-			if (fos !=null){
+			return handleException("Failed: " + response.getOriginalCommand(), e);
+		} finally {
+			if (fos != null) {
 				try {
 					fos.close();
 				} catch (IOException e) {
-					return handleException("Failed closing file", e);				}
+					return handleException("Failed closing file", e);
+				}
 			}
-			if (out != null){
+			if (out != null) {
 				try {
 					out.close();
 				} catch (IOException e) {
-					return handleException("Failed closing file", e);				}
+					return handleException("Failed closing file", e);
+				}
 			}
 		}
 		return response;
 	}
 
 	private CommandResponse setPreferanceCompleteRideCounter() {
-		//update the compte ride parameter in the preferences to be 0  so we won't get any popup for rate the App
+		// update the compte ride parameter in the preferences to be 0 so we won't get any popup for
+		// rate the App
 		CommandResponse response = new CommandResponse();
 		response.setOriginalCommand("setPreferanceCompleteRideCounter");
 		long valueOfCounter = 0;
@@ -1602,12 +1771,48 @@ public class SoloExecutor {
 			sharedPreferences.edit().putInt(COMPLETE_ORDERS, 0).commit();
 			valueOfCounter = sharedPreferences.getLong(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
 		} catch (Throwable e) {
-			return handleException("Failed: "+response.getOriginalCommand(), e);
+			return handleException("Failed: " + response.getOriginalCommand(), e);
 		}
 		response.setResponse("setPreferanceCompleteRideCounter + value of counter is " + String.valueOf(valueOfCounter));
 		response.setSucceeded(true);
 		return response;
 	}
 
+	private CommandResponse setPreferanceInUserApp(String[] params) {
+		// update the compte ride parameter in the preferences to be 0 so we won't get any popup for
+		// rate the App
+		CommandResponse response = new CommandResponse();
+		String SettingFileName = params[0];
+		String KeyPreferanceNameToBeChange = params[1];
+		response.setOriginalCommand("setPreferanceCompleteRideCounter");
+		long valueOfCounter = 0;
+		try {
+			SharedPreferences sharedPreferences = solo.getCurrentActivity().getApplicationContext().getSharedPreferences(SettingFileName, Context.MODE_PRIVATE);
+			sharedPreferences.edit().putInt(KeyPreferanceNameToBeChange, 0).commit();
+			valueOfCounter = sharedPreferences.getLong(SettingFileName, Context.MODE_PRIVATE);
+		} catch (Throwable e) {
+			return handleException("Failed: " + response.getOriginalCommand(), e);
+		}
+		response.setResponse("setPreferanceInUserApp + value of preferance key  is " + String.valueOf(valueOfCounter));
+		response.setSucceeded(true);
+		return response;
+	}
 
+	public CommandResponse launchServerEnviroment(String[] params) {
+		CommandResponse response = new CommandResponse();
+		String server = params[0];
+		try {
+
+			response.setOriginalCommand("set server enviroment" + server);
+			Intent intent = new Intent("com.gettaxi.android.OPEN_URL");
+			intent.putExtra("DATA", server);
+			// TODO: Assert that the last activity is not null and handle the exeception
+			solo.getActivityMonitor().getLastActivity().sendBroadcast(intent);
+		} catch (Throwable e) {
+			return handleException("Failed: " + response.getOriginalCommand(), e);
+		}
+		response.setResponse("set the server enviroment to run with  + value of preferance key  is " + server);
+		response.setSucceeded(true);
+		return response;
+	}
 }
