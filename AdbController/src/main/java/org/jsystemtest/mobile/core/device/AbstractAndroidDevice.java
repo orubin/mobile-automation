@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.jsystemtest.mobile.core.AdbController;
 import org.jsystemtest.mobile.core.ConnectionException;
 
@@ -21,14 +22,12 @@ import com.aqua.sysobj.conn.WindowsDefaultCliConnection;
 
 public abstract class AbstractAndroidDevice {
 	private final static Logger logger = Logger.getLogger(AbstractAndroidDevice.class);
-	
-	
+
 	protected final AndroidDebugBridge adb;
 	protected final IDevice device;
 
 	// Variables that we get from the AdbController
 	protected final File adbLocation;
-	
 
 	public AbstractAndroidDevice(AndroidDebugBridge adb, IDevice device) throws Exception {
 		super();
@@ -42,7 +41,6 @@ public abstract class AbstractAndroidDevice {
 			throw new Exception("Adb location was not set");
 		}
 
-		
 	}
 
 	/**
@@ -57,41 +55,87 @@ public abstract class AbstractAndroidDevice {
 		if (device.getState() == IDevice.DeviceState.ONLINE) {
 			device.createForward(localPort, remotePort);
 		} else {
-			Exception e = new Exception("Unable to perform port forwarding - " + device.getSerialNumber() + " is not online");
+			Exception e = new Exception("Unable to perform port forwarding - " + device.getSerialNumber()
+					+ " is not online");
 			logger.error(e);
 			throw e;
 		}
 	}
-	
-	public void launchActivity(String packageName, String activityName) throws Exception{
+
+	/**
+	 * Force stop all the activities with the specified package
+	 * 
+	 * @param packageName
+	 * @throws Exception
+	 */
+	public void forceStop(final String packageName) throws Exception {
+		try {
+			device.executeShellCommand("am force-stop " + packageName, new IShellOutputReceiver() {
+
+				@Override
+				public boolean isCancelled() {
+					return false;
+				}
+
+				@Override
+				public void flush() {
+
+				}
+
+				@Override
+				public void addOutput(byte[] data, int offset, int length) {
+					String message = new String(data, offset, length);
+					for (String line : message.split("\n")) {
+						logger.debug(line);
+					}
+				}
+			});
+
+		} catch (Exception er) {
+			Exception e = new Exception("Unable to force stop activity with package - " + packageName);
+			logger.error(e);
+			throw e;
+
+		}
+	}
+
+	public void launchActivity(String packageName, String activityName) throws Exception {
 		if (device.getState() == IDevice.DeviceState.ONLINE) {
-				
-//			 adb -s 0146B5040F00A012 shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity
-//			adb -s 0146B5040F00A012 shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity");
-			final String command = String.format("adb shell am start -a android.intent.action.MAIN -n %s/.%s", packageName,activityName);
-			//"adb shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity";
-				device.executeShellCommand(command,new IShellOutputReceiver() {
-					
-					@Override
-					public boolean isCancelled() {
-						// TODO Auto-generated method stub
-						return false;
+
+			// adb -s 0146B5040F00A012 shell am start -a
+			// android.intent.action.MAIN -n
+			// il.co.topq.mobile.server.application/.RobotiumServerActivity
+			// adb -s 0146B5040F00A012 shell am start -a
+			// android.intent.action.MAIN -n
+			// il.co.topq.mobile.server.application/.RobotiumServerActivity");
+			final String command = String.format("adb shell am start -a android.intent.action.MAIN -n %s/.%s",
+					packageName, activityName);
+			// "adb shell am start -a android.intent.action.MAIN -n il.co.topq.mobile.server.application/.RobotiumServerActivity";
+			device.executeShellCommand(command, new IShellOutputReceiver() {
+
+				@Override
+				public boolean isCancelled() {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+				@Override
+				public void flush() {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void addOutput(byte[] data, int offset, int length) {
+					String message = new String(data, offset, length);
+					for (String line : message.split("\n")) {
+						logger.debug(line);
 					}
-					
-					@Override
-					public void flush() {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void addOutput(byte[] data, int offset, int length) {
-						// TODO Auto-generated method stub
-						
-					}
-				});
+
+				}
+			});
 		} else {
-			Exception e = new Exception("Unable to launch activity - " + activityName+". Device is offline");
+			Exception e = new Exception("Unable to launch activity - " + activityName + ". Device is offline");
 			logger.error(e);
 			throw e;
 		}
@@ -191,7 +235,6 @@ public abstract class AbstractAndroidDevice {
 		return screenshotFile;
 	}
 
-
 	/**
 	 * Grab file from the device
 	 * 
@@ -225,17 +268,17 @@ public abstract class AbstractAndroidDevice {
 	}
 
 	public abstract void connect() throws ConnectionException;
-	
+
 	public abstract void disconnect();
-	
-	public abstract void runTestOnDevice(String pakageName, String testClassName, String testName) throws IOException, Exception;
-	
-	public String toString(){
+
+	public abstract void runTestOnDevice(String pakageName, String testClassName, String testName) throws IOException,
+			Exception;
+
+	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Serial Number:").append(device.getSerialNumber()).append("\n");
 		return sb.toString();
 	}
-	
 
 	/**
 	 * Push file to the device
@@ -249,7 +292,7 @@ public abstract class AbstractAndroidDevice {
 	 */
 	public void pushFileToDevice(String remotefileLocation, String localLocation) throws Exception {
 		try {
-			device.getSyncService().pushFile(localLocation, remotefileLocation,SyncService.getNullProgressMonitor());
+			device.getSyncService().pushFile(localLocation, remotefileLocation, SyncService.getNullProgressMonitor());
 		} catch (Exception e) {
 			logger.error("Exception ", e);
 			throw e;
@@ -264,7 +307,6 @@ public abstract class AbstractAndroidDevice {
 	 */
 	public abstract void installPackage(String apkLocation, boolean reinstall) throws InstallException;
 
-
 	public boolean isOnline() {
 		return device.isOnline();
 	}
@@ -272,11 +314,12 @@ public abstract class AbstractAndroidDevice {
 	public boolean isOffline() {
 		return device.isOffline();
 	}
-	
-	public String getSerialNumber(){
+
+	public String getSerialNumber() {
 		return device.getSerialNumber();
 	}
-// livnat added this function 
+
+	// livnat added this function
 	public IDevice getDevice() {
 		return device;
 	}
