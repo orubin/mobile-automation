@@ -27,6 +27,7 @@ import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
@@ -280,6 +281,8 @@ public class SoloExecutor {
 			response = clickOnActionBarHomeButton();
 		} else if (commandStr.equals("showMenuOptions")) {
 			response = showMenuOptions();
+		} else if (commandStr.equals("deleteAppData")) {
+			response = deleteAppData();			
 		} else if (commandStr.equals("pull")) {
 			response = pull(request.getParams());
 		} else if (commandStr.equals("push")) {
@@ -1774,6 +1777,22 @@ public class SoloExecutor {
 			return handleException("Failed: " + response.getOriginalCommand(), e);
 		}
 		response.setResponse("setPreferanceCompleteRideCounter + value of counter is " + String.valueOf(valueOfCounter));
+		response.setSucceeded(true);
+		return response;
+	}
+	
+	private CommandResponse deleteAppData() {
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("deleteAppData");
+		try {
+			
+			Editor editor = solo.getCurrentActivity().getApplicationContext().getSharedPreferences(SETTINGS_FILE_NAME, Context.MODE_PRIVATE).edit();
+			editor.clear();
+			editor.commit();
+		} catch (Throwable e) {
+			return handleException("Failed: " + response.getOriginalCommand(), e);
+		}
+		response.setResponse("deleteAppData - delet all app cookies ");
 		response.setSucceeded(true);
 		return response;
 	}

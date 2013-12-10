@@ -70,6 +70,7 @@ public abstract class AbstractAndroidDevice {
 	 */
 	public void forceStop(final String packageName) throws Exception {
 		try {
+			System.out.println("force stop");
 			device.executeShellCommand("am force-stop " + packageName, new IShellOutputReceiver() {
 
 				@Override

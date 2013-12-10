@@ -16,13 +16,13 @@
 	<repositories>
 		<repository>
 			<id>nexus</id>
-			<url>http://80.74.108.9/content/groups/public</url>
+			<url>http://repository.ow2.org/nexus/content/repositories/public/</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
-			<id>TOP-Q_plugin_repo</id>
-			<url>http://80.74.108.9:80/content/groups/public</url>
+			<id>Top-Q_plugin_repo</id>
+			<url>http://maven.top-q.co.il/content/groups/public</url>
 		</pluginRepository>
 	</pluginRepositories>
 	<build>

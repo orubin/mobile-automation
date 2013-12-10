@@ -272,4 +272,7 @@ public interface MobileClientInterface {
 	public CommandResponse clearEditTextByIndex(int index) throws Exception ;
 	public CommandResponse clearEditText(int viewId) throws Exception ;
 	public CommandResponse setText( String text) throws Exception ;
+	public CommandResponse deleteAppData() throws Exception ;
+	
+	
 }

@@ -730,5 +730,10 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse clearEditTextByIndex(int index) throws Exception {
 		 return sendData("clearEditTextByIndex", Integer.toString(index));
 	}
+	public CommandResponse deleteAppData() throws Exception {
+		 return sendData("deleteAppData");
+	}
+	
+	
 
 }
