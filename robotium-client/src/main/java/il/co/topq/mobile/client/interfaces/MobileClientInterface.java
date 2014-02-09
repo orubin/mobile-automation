@@ -3,8 +3,6 @@ package il.co.topq.mobile.client.interfaces;
 import il.co.topq.mobile.common.client.enums.HardwareButtons;
 import il.co.topq.mobile.common.datamodel.CommandResponse;
 
-import java.io.File;
-
 
 /**
  * 
@@ -209,15 +207,6 @@ public interface MobileClientInterface {
 
 	public abstract CommandResponse scrollToEdge(EDGE edge) throws Exception;
 
-	/**
-	 * Takes a screenshot
-	 * 
-	 * @return JPEG file that represents the current screenshot or null if fails
-	 *         to take the screenshot.
-	 * @throws Exception
-	 */
-	public abstract File takeScreenshot() throws Exception;
-
 	public abstract CommandResponse clickInList(int index) throws Exception;
 
 	public abstract CommandResponse clickInList(int index1, int index2) throws Exception;
@@ -273,6 +262,10 @@ public interface MobileClientInterface {
 	public CommandResponse clearEditText(int viewId) throws Exception ;
 	public CommandResponse setText( String text) throws Exception ;
 	public CommandResponse deleteAppData() throws Exception ;
-	
-	
+	public CommandResponse getDeviceName() throws Exception;
+	public CommandResponse waitForText(String text) throws Exception;
+	public CommandResponse countItemsInList(int viewId) throws Exception ;
+	public CommandResponse closeSpecificApplication(String packageName) throws Exception ;
+	public CommandResponse launchServerEnviromentWeb(String server, String packageName) throws Exception;
+	public CommandResponse getTable(String language, String requestedValue) throws Exception;
 }

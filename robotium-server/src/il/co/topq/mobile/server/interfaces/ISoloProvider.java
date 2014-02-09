@@ -1,6 +1,6 @@
 package il.co.topq.mobile.server.interfaces;
 
-import com.jayway.android.robotium.solo.Solo;
+import com.robotium.solo.Solo;
 
 /**
  * 

@@ -10,6 +10,7 @@ public class CommandResponse {
 	private String originalCommand;
 	private String[] params;
 	private String response;
+	private String[] returnedValues;
 	private boolean isSucceeded;
 	
 	/**
@@ -20,6 +21,7 @@ public class CommandResponse {
 		this.params = null;
 		this.response = null;
 		this.isSucceeded = false;
+		this.returnedValues = null;
 	}
 	
 	/**
@@ -84,6 +86,14 @@ public class CommandResponse {
 	 */
 	public void setParams(String[] params) {
 		this.params = params;
+	}
+
+	public String[] getReturnedValues() {
+		return returnedValues;
+	}
+
+	public void setReturnedValues(String[] returnedValues) {
+		this.returnedValues = returnedValues;
 	}
 
 }

@@ -3,6 +3,8 @@ package com.jayway.android.robotium.solo;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import com.robotium.solo.Solo;
+
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.graphics.Bitmap;
@@ -31,30 +33,6 @@ public class SoloEnhanced extends Solo {
 
 	public SoloEnhanced(Instrumentation instrumentation) {
 		super(instrumentation);
-	}
-
-	/**
-	 * 
-	 * @param blocking
-	 *            This parameter is not used. We just had to make the method
-	 *            signature different from the one in Solo.
-	 * @return byte[] - representation of the JPEG screenshot or null if fails
-	 *         to get the screenshot
-	 */
-	public byte[] takeScreenshot(boolean blocking) {
-		int counter = 0;
-		while (counter<10){
-			try{
-				View decorView = super.viewFetcher.getRecentDecorView(super.viewFetcher.getWindowDecorViews());
-				Log.i("TcpServer", "take screenshot took: " + counter + " tries");
-				return takeScreenshot(decorView);
-			}
-			catch(Throwable t){
-				Log.e("TcpServer", t.getMessage(), t);
-			}
-			counter++;
-		}
-		return null;
 	}
 
 	public byte[] takeScreenshot(final View view) {

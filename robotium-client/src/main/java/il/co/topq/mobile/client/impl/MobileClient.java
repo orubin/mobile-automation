@@ -7,10 +7,6 @@ import il.co.topq.mobile.common.datamodel.CommandResponse;
 import il.co.topq.mobile.common.server.consts.TcpConsts;
 import il.co.topq.mobile.common.server.utils.JsonParser;
 import il.co.topq.mobile.tcp.impl.TcpClient;
-
-import java.io.File;
-import java.io.FileOutputStream;
-
 import net.iharder.Base64;
 
 import org.apache.log4j.Logger;
@@ -433,33 +429,6 @@ public class MobileClient implements MobileClientInterface {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see il.co.topq.mobile.client.impl.Delme#takeScreenshot()
-	 */
-	@Override
-	public File takeScreenshot() throws Exception {
-		CommandResponse response = sendData("takeScreenshot");
-		File tempFile = null;
-		if (response.isSucceeded()) {
-			byte[] body = Base64.decode(response.getResponse());
-
-			tempFile = File.createTempFile("screenshot", ".jpg");
-			FileOutputStream imageOutFile = null;
-			try {
-				imageOutFile = new FileOutputStream(tempFile);
-				imageOutFile.write(body);
-			} finally {
-				if (imageOutFile != null) {
-					imageOutFile.close();
-				}
-			}
-		}
-
-		return tempFile;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see il.co.topq.mobile.client.impl.Delme#clickInList(int)
 	 */
 	@Override
@@ -694,9 +663,6 @@ public class MobileClient implements MobileClientInterface {
     public CommandResponse setPreferanceInUserApp(String SettingFileName,String KeyPreferanceNameToBeChange) throws Exception {
         return sendData("setPreferanceInUserApp",SettingFileName,KeyPreferanceNameToBeChange);
     }
-	
-
-
 
 	public CommandResponse isButtonVisible(Attribute attribute, String value) throws Exception {
 		return sendData("isButtonVisible", attribute.name(), value);
@@ -720,12 +686,10 @@ public class MobileClient implements MobileClientInterface {
 		this.executorID = executorID;
 	}
 
-
 	@Override
 	public CommandResponse launchServerEnviroment(String serverName) throws Exception {
 		return sendData("launchServerEnviroment", serverName);
 	}
-
 
 	public CommandResponse clearEditTextByIndex(int index) throws Exception {
 		 return sendData("clearEditTextByIndex", Integer.toString(index));
@@ -733,7 +697,34 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse deleteAppData() throws Exception {
 		 return sendData("deleteAppData");
 	}
-	
-	
 
+	public CommandResponse getDeviceName() throws Exception {
+		return sendData("getDeviceName");
+	}
+
+	@Override
+	public CommandResponse waitForText(String text) throws Exception {
+		return sendData("waitForText", text);
+	}
+	
+	@Override
+	public CommandResponse countItemsInList(int viewId) throws Exception {
+		return sendData("countItemsInList", String.valueOf(viewId));
+	}
+
+	@Override
+	public CommandResponse closeSpecificApplication(String packageName) throws Exception{
+		return sendData("closeSpecificApplication", packageName);
+	}
+	
+	@Override
+	public CommandResponse launchServerEnviromentWeb(String server, String packageName) throws Exception{
+		return sendData("launchServerEnviromentWeb", server, packageName);
+	}
+
+	@Override
+	public CommandResponse getTable(String language, String requestedValue) throws Exception {
+		return sendData("getTable", language, requestedValue);
+	}
+	
 }

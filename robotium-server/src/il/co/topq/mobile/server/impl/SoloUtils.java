@@ -5,7 +5,7 @@ import android.graphics.Point;
 import android.os.Build;
 import android.view.Display;
 
-import com.jayway.android.robotium.solo.Solo;
+import com.robotium.solo.Solo;
 
 public class SoloUtils {
 	

@@ -1,12 +1,8 @@
 package il.co.topq.mobile.server.impl;
 
-import il.co.topq.mobile.server.interfaces.ISoloProvider;
-
-import il.co.topq.mobile.server.interfaces.IExecutorService;
 import il.co.topq.mobile.server.interfaces.IDataCallback;
-
-
-
+import il.co.topq.mobile.server.interfaces.IExecutorService;
+import il.co.topq.mobile.server.interfaces.ISoloProvider;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.ComponentName;
@@ -18,8 +14,7 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.jayway.android.robotium.solo.Solo;
-import com.jayway.android.robotium.solo.SoloEnhanced;
+import com.robotium.solo.Solo;
 
 
 /**
@@ -177,7 +172,6 @@ public class RobotiumExecutorApp2 extends Instrumentation implements ISoloProvid
 		try {
 			return serviceApi.getLastExecutorID();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			Log.e(TAG, "Error while getting executor id",e);
 		}
 		return null;

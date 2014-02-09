@@ -20,10 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.app.Application;
 import android.app.Instrumentation;
+import android.app.Instrumentation.ActivityMonitor;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,11 +40,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.jayway.android.robotium.solo.Solo;
-import com.jayway.android.robotium.solo.SoloEnhanced;
+import com.robotium.solo.Solo;
 
 /**
  * 
@@ -135,7 +142,6 @@ public class SoloExecutor {
 		keys.put('.', KeyEvent.KEYCODE_PERIOD);
 		keys.put(' ', KeyEvent.KEYCODE_SPACE);
 		keys.put('*', KeyEvent.KEYCODE_ENTER);// for Next or done
-
 	}
 
 	/**
@@ -171,6 +177,24 @@ public class SoloExecutor {
 			this.soloProvider.syncActivity();
 		}
 		String commandStr = request.getCommand();
+		
+//		
+//		String[] params = null;
+//		
+//		
+//		Method method = this.getClass().getMethod(commandStr, null);
+//		CommandResponse response;
+//		if(request.getParams()!=null){
+//			method = this.getClass().getMethod(commandStr, null);
+//			response = (CommandResponse) method.invoke(this, request.getParams());
+//		}
+//		else{
+//			method = this.getClass().getMethod(commandStr, null);
+//			response = (CommandResponse) method.invoke(this);
+//		}
+		
+		
+		
 		if (commandStr.equals("scrollToEdge")) {
 			response = scrollToEdge(request.getParams());
 		} else if (commandStr.equals("setPortraitOrientation")) {
@@ -191,6 +215,8 @@ public class SoloExecutor {
 			response = scrollDown(request.getParams());
 		} else if (commandStr.equals("isTextVisible")) {
 			response = isTextVisible(request.getParams());
+		} else if (commandStr.equals("waitForText")) {
+			response = waitForText(request.getParams());			
 		} else if (commandStr.equals("clickOnImageButton")) {
 			response = clickOnImagButton(request.getParams());
 		} else if (commandStr.equals("clickOnImage")) {
@@ -251,8 +277,6 @@ public class SoloExecutor {
 			response = activateIntent(request.getParams());
 		} else if (commandStr.equals("waitForActivity")) {
 			response = waitForActivity(request.getParams());
-		} else if (commandStr.equals("takeScreenshot")) {
-			response = takeScreenshot();
 		} else if (commandStr.equals("clickInList")) {
 			response = clickInList(request.getParams());
 		} else if (commandStr.equals("getAllVisibleIds")) {
@@ -293,16 +317,64 @@ public class SoloExecutor {
 			response = setPreferanceInUserApp(request.getParams());
 		} else if (commandStr.equals("launchServerEnviroment")) {
 			response = launchServerEnviroment(request.getParams());
-
+		} else if (commandStr.equals("getDeviceName")) {
+			response = getDeviceName();
+		} else if (commandStr.equals("countItemsInList")) {
+			response = countItemsInList(request.getParams());
+		} else if (commandStr.equals("closeSpecificApplication")) {
+			response = closeSpecificApplication(request.getParams());
+		} else if (commandStr.equals("launchServerEnviromentWeb")) {
+			response = launchServerEnviromentWeb(request.getParams());
+		} else if (commandStr.equals("getTable")) {
+			response = getTable(request.getParams());
 		}
+		else{
+			Log.e(TAG, "ERROR - Didn't find the method: " + request.getCommand() + request.getParams() + " in this class - SoloExecutor!");
+		}
+		
 		response.setOriginalCommand(request.getCommand());
 		response.setParams(request.getParams());
 		String result = JsonParser.toJson(response);
 		Log.i(TAG, "The Result is:" + result);
 		return result;
-
+	}
+	
+	public CommandResponse getDeviceName() {
+		  CommandResponse result = new CommandResponse();
+		  String command = "the command \"getDeviceName\": ";
+		  result.setSucceeded(true);
+		  
+		  String manufacturer = Build.MANUFACTURER;
+		  String model = Build.MODEL;
+		  
+		  if (model.startsWith(manufacturer)) {
+			  command += capitalize(model);
+			  result.setResponse(command);
+		  } else {
+			  command += capitalize(manufacturer) + " " + model;
+			  result.setResponse(command);
+		  }
+		  
+		  String[] array = new String[2];
+		  array[0] = capitalize(manufacturer);
+		  array[1] = model;
+		  result.setReturnedValues(array);
+			
+		  return result;
 	}
 
+	private String capitalize(String s) {
+	  if (s == null || s.length() == 0) {
+	    return "";
+	  }
+	  char first = s.charAt(0);
+	  if (Character.isUpperCase(first)) {
+	    return s;
+	  } else {
+	    return Character.toUpperCase(first) + s.substring(1);
+	  }
+	} 
+		
 	private CommandResponse click(String[] params) {
 		CommandResponse result = new CommandResponse();
 		result.setOriginalCommand("click");
@@ -458,6 +530,24 @@ public class SoloExecutor {
 		}
 		return result;
 	}
+	
+	private CommandResponse waitForText(String[] params) {
+		String command = "the command waitForText";
+		CommandResponse result = new CommandResponse();
+		String response = "";
+		try {
+			response = "waiting for text";
+			if (solo.waitForText(params[0])) {
+				result.setResponse(command + ",Response: " + response + " is visible");
+			} else {
+				result.setResponse(command + ",Response: " + response + " is not visible");
+			}
+			result.setSucceeded(true);
+		} catch (Throwable e) {
+			result = handleException(command, e);
+		}
+		return result;
+	}
 
 	private CommandResponse scrollDownUntilTextIsVisible(String[] params) {
 		String command = "the command scroll down until text is visible";
@@ -501,7 +591,7 @@ public class SoloExecutor {
 					result.setSucceeded(true);
 				} else {
 					result.setResponse("view with ID: " + viewId + " is not visible");
-					result.setSucceeded(true);
+					result.setSucceeded(false);
 				}
 			} else {
 				result.setResponse("view with ID: " + viewId + " is not found ");
@@ -534,7 +624,7 @@ public class SoloExecutor {
 				result.setSucceeded(true);
 			} else {
 				result.setResponse("view: " + viewName + " is not visible");
-				result.setSucceeded(true);
+				result.setSucceeded(false);
 			}
 		} catch (Throwable e) {
 			result.setResponse(command + "failed due to " + e.getMessage());
@@ -1116,7 +1206,7 @@ public class SoloExecutor {
 	 * @return response with the status of the command
 	 */
 	private CommandResponse isButtonVisible(String[] arguments) {
-		String command = "the command isButtonVisible ";
+		String command = "the command isButtonVisible";
 		CommandResponse result = new CommandResponse();
 		boolean isVisible = false;
 		try {
@@ -1159,6 +1249,44 @@ public class SoloExecutor {
 		} else {
 			throw new Exception("Button with text: " + buttonText + " was not found");
 		}
+	}
+
+	private CommandResponse getTable(String[] params) {
+		CommandResponse result = new CommandResponse();
+		String response = "the command getTable";
+		String requestedValue = null;
+		String language = params[0];
+		String buttonText = params[1];
+		ArrayList<View> array = solo.getCurrentViews();
+		for (View view : array) {
+			if(view instanceof android.widget.TableLayout){
+				android.widget.TableLayout table = (TableLayout) view;
+				Log.i(TAG, Integer.toString(table.getChildCount()));
+				for (int i = 0; i < table.getChildCount(); i++) {
+					try {
+						LinearLayout row = (LinearLayout) table.getChildAt(i);
+						for (int j = 0; j < row.getChildCount(); j++) {//run over the textviews in the row
+							TextView t = (TextView) row.getChildAt(j);
+							if(t.getText().toString().contains(buttonText)){
+								if(language.equalsIgnoreCase("HE"))
+									requestedValue = ((TextView) row.getChildAt(j-1)).getText().toString();
+								else
+									requestedValue = ((TextView) row.getChildAt(j+1)).getText().toString();
+							}
+						}
+					} catch (Exception e) {
+						if(e!=null)	
+							Log.e(TAG, e.getMessage());
+					}
+				}
+			}
+		}
+		String[] arr = new String[1];
+		arr[0] = requestedValue;
+		result.setReturnedValues(arr);
+		result.setResponse(response);
+		result.setSucceeded(true);
+		return result;
 	}
 
 	/**
@@ -1221,7 +1349,6 @@ public class SoloExecutor {
 				result.setResponse(command);
 				result.setSucceeded(true);
 			} else {
-
 				result.setResponse("try to enter text in text view - View is instance of " + view.getClass().getSimpleName() + " instead of EditText");
 				result.setSucceeded(false);
 			}
@@ -1253,7 +1380,6 @@ public class SoloExecutor {
 			}
 			result.setResponse(command);
 			result.setSucceeded(true);
-
 		} catch (Throwable e) {
 			result = handleException(command, e);
 		}
@@ -1269,7 +1395,7 @@ public class SoloExecutor {
 	 */
 
 	private CommandResponse enterTextByIndex(String[] params) {
-		String command = "the command  enterText";
+		String command = "the command  enterText By Index";
 		CommandResponse result = new CommandResponse();
 		try {
 			command += "(" + params[0] + "," + params[1] + ")";
@@ -1442,27 +1568,6 @@ public class SoloExecutor {
 		return result;
 	}
 
-	@TargetApi(Build.VERSION_CODES.FROYO)
-	private CommandResponse takeScreenshot() {
-		Log.i(TAG, "About to take screenshot");
-		return soloEnhancedScreenshot();
-	}
-
-	@TargetApi(Build.VERSION_CODES.FROYO)
-	private CommandResponse soloEnhancedScreenshot() {
-		CommandResponse response = new CommandResponse();
-		response.setOriginalCommand("takeScreenshot");
-		byte[] imageData = ((SoloEnhanced) solo).takeScreenshot(true);
-		if (null == imageData) {
-			response.setSucceeded(false);
-			response.setResponse("Failed getting a screenshot");
-			return response;
-		}
-		response.setResponse(Base64.encodeToString(imageData, Base64.DEFAULT));
-		response.setSucceeded(true);
-		return response;
-	}
-
 	/**
 	 * clicks on a view
 	 * 
@@ -1538,9 +1643,38 @@ public class SoloExecutor {
 			response.setOriginalCommand("closeApplication");
 			Log.i(TAG, "Robotium: About to close application");
 			solo.finishOpenedActivities();
-
 		} catch (Exception e) {
-			return handleException("Failed to invokeMenuActionSync and click on menue item - item id  ", e);
+			return handleException("Failed to close Application", e);
+		}
+		response.setResponse(command);
+		response.setSucceeded(true);
+		return response;
+	}
+	
+	private CommandResponse closeSpecificApplication(String[] params) {
+		CommandResponse response = new CommandResponse();
+		String command = "the command closeApplication";
+		String packageAppName = null;
+		try {
+			packageAppName = params[0];
+			response.setOriginalCommand("closeSpecificApplication");
+			Log.i(TAG, "Robotium: About to close Specific application + " + packageAppName);
+			solo.finishOpenedActivities();
+			android.os.Process.killProcess(android.os.Process.getUidForName(packageAppName));
+			
+			//List<RunningTaskInfo> runningTasks = solo.getActivityMonitor().//getRunningTask(1);
+			
+					
+			
+			
+			if(android.os.Process.getUidForName(packageAppName)!=-1){//if closing didn't succeed
+				response.setSucceeded(false);
+				Log.i(TAG, "Closing didn't succeed for: " + packageAppName);
+				return response;
+			}
+			
+		} catch (Exception e) {
+			return handleException("Failed to kill " + packageAppName, e);
 		}
 		response.setResponse(command);
 		response.setSucceeded(true);
@@ -1821,8 +1955,7 @@ public class SoloExecutor {
 		CommandResponse response = new CommandResponse();
 		String server = params[0];
 		try {
-
-			response.setOriginalCommand("set server enviroment" + server);
+			response.setOriginalCommand("set server environment" + server);
 			Intent intent = new Intent("com.gettaxi.android.OPEN_URL");
 			intent.putExtra("DATA", server);
 			// TODO: Assert that the last activity is not null and handle the exeception
@@ -1846,5 +1979,78 @@ public class SoloExecutor {
 		response.setResponse("set the server enviroment to run with  + value of preferance key  is " + server);
 		response.setSucceeded(true);
 		return response;
+	}
+	
+	public CommandResponse launchServerEnviromentWeb(String[] params) {
+		CommandResponse response = new CommandResponse();
+		String server = params[0];
+		String packageName = params[1];
+		try {
+			response.setOriginalCommand("set server environment: " + server);
+			Intent intent = new Intent("com.gettaxi.android.OPEN_URL");
+			intent.putExtra("DATA", server);
+
+			
+			Log.d(TAG, "server: " + server);
+			Log.d(TAG, "packageName: " + packageName);
+			
+			// TODO: Assert that the last activity is not null and handle the exeception
+			Activity lastActivity = solo.getActivityMonitor().getLastActivity();
+			
+			Log.d(TAG, "lastActivity: " + lastActivity);
+			
+			
+			Application app = lastActivity.getApplication();
+			
+			Log.d(TAG, "app: " + app.toString());
+			
+			
+			intent = app.getPackageManager().getLaunchIntentForPackage(packageName);
+			
+			Log.d(TAG, "intent:" + intent);
+			
+			
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			app.startActivity(intent);
+			
+			
+			if (lastActivity == null || lastActivity.isFinishing()) {
+				solo.getCurrentActivity();
+				if (lastActivity == null || lastActivity.isFinishing()) {				
+					response.setResponse("set the server enviroment to run with server : " + server + "   can't get last activity , the returned value is  : "+ lastActivity );
+					response.setSucceeded(false);
+				} else{
+					lastActivity.sendBroadcast(intent);
+				}
+				return response;
+			} else {
+				lastActivity.sendBroadcast(intent);
+			}
+
+		} catch (Throwable e) {
+			return handleException("Failed: " + response.getOriginalCommand(), e);
+		}
+		response.setResponse("set the server environment to run with  + value of preferance key  is " + server);
+		response.setSucceeded(true);
+		return response;
+	}
+
+	private CommandResponse countItemsInList(String[] params) {
+		CommandResponse result = new CommandResponse();
+		String command = "the command \"getListView\": ";
+		final View view = solo.getView(Integer.parseInt(params[0]));
+		if (view instanceof ListView) {
+			ListView listView = (ListView) view;
+			int count = listView.getChildCount();
+			String[] array = new String[1];
+			array[0] = String.valueOf(count);
+			result.setReturnedValues(array);
+			result.setResponse(command);
+			result.setSucceeded(true);
+		} else {
+			result.setSucceeded(false);
+			result.setResponse("View is instance of " + view.getClass().getSimpleName() + " instead of ListView");
+		}
+		return result;
 	}
 }
