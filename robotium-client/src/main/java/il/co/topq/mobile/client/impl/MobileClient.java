@@ -727,4 +727,8 @@ public class MobileClient implements MobileClientInterface {
 		return sendData("getTable", language, requestedValue);
 	}
 	
+	public CommandResponse takeScreenshot() throws Exception {
+		return sendData("takeScreenshot");
+	}
+	
 }
