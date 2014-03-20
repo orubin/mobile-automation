@@ -177,8 +177,6 @@ public interface MobileClientInterface {
 	 * 
 	 * @throws Exception
 	 */
-	public abstract void closeConnection() throws Exception;
-
 	public abstract CommandResponse getViews() throws Exception;
 
 	public abstract CommandResponse swipeLeft() throws Exception;

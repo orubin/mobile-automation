@@ -104,7 +104,7 @@ public class MobileClient implements MobileClientInterface {
 		try {
 			String resultStr = null;
 			if ((resultStr = this.tcpClient.sendData(jsonRequest)) == null) {
-				throw new Exception("No data recvied from server! please check server log!");
+				throw new Exception("No data received from server! Please check server log!");
 			}
 			result = JsonParser.fromJson(resultStr, CommandResponse.class);
 		} catch (Exception e) {
@@ -268,16 +268,6 @@ public class MobileClient implements MobileClientInterface {
 	@Override
 	public CommandResponse clickOnHardwareButton(HardwareButtons button) throws Exception {
 		return sendData("clickOnHardware", button.name());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see il.co.topq.mobile.client.impl.Delme#closeConnection()
-	 */
-	@Override
-	public void closeConnection() throws Exception {
-		sendData("exit");
 	}
 
 	/*
@@ -725,6 +715,10 @@ public class MobileClient implements MobileClientInterface {
 	@Override
 	public CommandResponse getTable(String language, String requestedValue) throws Exception {
 		return sendData("getTable", language, requestedValue);
+	}
+
+	public CommandResponse takeScreenshot() throws Exception {
+		return sendData("takeScreenshot");
 	}
 	
 }
