@@ -327,7 +327,10 @@ public class SoloExecutor {
 			response = launchServerEnviromentWeb(request.getParams());
 		} else if (commandStr.equals("getTable")) {
 			response = getTable(request.getParams());
+		} else if (commandStr.equals("clickOnListItemByText")) {
+			response = clickOnListItemByText(request.getParams());
 		}
+		
 		else{
 			Log.e(TAG, "ERROR - Didn't find the method: " + request.getCommand() + request.getParams() + " in this class - SoloExecutor!");
 		}
@@ -2051,6 +2054,34 @@ public class SoloExecutor {
 			result.setSucceeded(false);
 			result.setResponse("View is instance of " + view.getClass().getSimpleName() + " instead of ListView");
 		}
+		return result;
+	}
+	public CommandResponse clickOnListItemByText(String[] params){
+		CommandResponse result = new CommandResponse();
+		String command = "the command \"getListView\": ";
+		String searchedItemText= params[0]; 
+		for (View view : solo.getCurrentViews()) {
+			if (view instanceof ListView) {
+				ListView listView = (ListView) view;
+				int count = listView.getChildCount();
+				for( int i =0 ; i<count ;i++)
+					{	// assuming that we have only oe list view on the current main activity  
+						String   context= (String) listView.getChildAt(i).getContext().getText(0);
+						Log.d(TAG, "context text : " + context.toString());
+						if ( context.contains(searchedItemText)){
+							String[] array = new String[1];
+							array[0] = String.valueOf(i);
+							result.setReturnedValues(array);
+							result.setResponse(command);
+							result.setSucceeded(true); 
+							this.solo.clickInList(i);// click on the item in the list 
+							return result;
+						}
+					}
+				}
+		}
+		result.setSucceeded(false);
+		result.setResponse("can't fins searched text in view the searched text is :  " + searchedItemText + " in method clickOnListItemByText");
 		return result;
 	}
 }
