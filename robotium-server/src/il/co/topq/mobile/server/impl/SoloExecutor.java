@@ -56,6 +56,7 @@ import com.robotium.solo.Solo;
 public class SoloExecutor {
 
 	private static final String COMPLETE_ORDERS = "COMPLETE_ORDERS";
+	private static final String FIRST_PROMO_INVITE = "FIRST_PROMO_INVITE";
 	private static final String SETTINGS_FILE_NAME = "app_pref.dat";
 	private static final String TAG = "SoloExecutor";
 	private Instrumentation instrumentation;
@@ -313,6 +314,8 @@ public class SoloExecutor {
 			response = createFileInServer(request.getParams());
 		} else if (commandStr.equals("setPreferanceCompleteRideCounter")) {
 			response = setPreferanceCompleteRideCounter();
+		} else if (commandStr.equals("setPreferanceFirstPromoInvite")) {
+			response = setPreferanceFirstPromoInvite();
 		} else if (commandStr.equals("setPreferanceInUserApp")) {
 			response = setPreferanceInUserApp(request.getParams());
 		} else if (commandStr.equals("launchServerEnviroment")) {
@@ -1914,6 +1917,23 @@ public class SoloExecutor {
 			return handleException("Failed: " + response.getOriginalCommand(), e);
 		}
 		response.setResponse("setPreferanceCompleteRideCounter + value of counter is " + String.valueOf(valueOfCounter));
+		response.setSucceeded(true);
+		return response;
+	}
+	private CommandResponse setPreferanceFirstPromoInvite() {
+		// update the compte ride parameter in the preferences to be 0 so we won't get any popup for
+		// rate the App
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("setPreferanceFirstPromoInvite");
+		long valueOfCounter = 0;
+		try {
+			SharedPreferences sharedPreferences = solo.getCurrentActivity().getApplicationContext().getSharedPreferences(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
+			sharedPreferences.edit().putBoolean(FIRST_PROMO_INVITE, true).commit();
+			valueOfCounter = sharedPreferences.getLong(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
+		} catch (Throwable e) {
+			return handleException("Failed: " + response.getOriginalCommand(), e);
+		}
+		response.setResponse("setPreferanceFirstPromoInvite + value of counter is " + String.valueOf(valueOfCounter));
 		response.setSucceeded(true);
 		return response;
 	}

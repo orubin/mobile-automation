@@ -644,7 +644,12 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse setPreferanceCompleteRideCounter() throws Exception {
 		return sendData("setPreferanceCompleteRideCounter");
 	}
-
+	
+	@Override
+	public CommandResponse setPreferanceFirstPromoInvite() throws Exception {
+		return sendData("setPreferanceFirstPromoInvite");
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -663,7 +668,7 @@ public class MobileClient implements MobileClientInterface {
     public CommandResponse setPreferanceInUserApp(String SettingFileName,String KeyPreferanceNameToBeChange) throws Exception {
         return sendData("setPreferanceInUserApp",SettingFileName,KeyPreferanceNameToBeChange);
     }
-
+	
 	public CommandResponse isButtonVisible(Attribute attribute, String value) throws Exception {
 		return sendData("isButtonVisible", attribute.name(), value);
 	}
