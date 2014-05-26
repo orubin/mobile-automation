@@ -268,6 +268,6 @@ public interface MobileClientInterface {
 	public CommandResponse closeSpecificApplication(String packageName) throws Exception ;
 	public CommandResponse launchServerEnviromentWeb(String server, String packageName) throws Exception;
 	public CommandResponse getTable(String language, String requestedValue) throws Exception;
-	public CommandResponse clickOnListItemByText(String searchedTextInList) throws Exception;
+	public CommandResponse getIndexListItemByText(String searchedTextInList,int viewId) throws Exception;
 	public CommandResponse setPreferanceFirstPromoInvite() throws Exception;
 }

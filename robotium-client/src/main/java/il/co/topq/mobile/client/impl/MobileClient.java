@@ -732,8 +732,8 @@ public class MobileClient implements MobileClientInterface {
 		return sendData("getTable", language, requestedValue);
 	}
 	@Override
-	public CommandResponse clickOnListItemByText( String searchedTextInList) throws Exception {
-		return sendData("getTable", searchedTextInList);
+	public CommandResponse getIndexListItemByText( String searchedTextInList, int viewId) throws Exception {
+		return sendData("getIndexListItemByText", searchedTextInList, String.valueOf(viewId));
 	}
 		
 }

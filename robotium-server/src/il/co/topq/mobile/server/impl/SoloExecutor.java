@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import android.R.layout;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -330,8 +331,8 @@ public class SoloExecutor {
 			response = launchServerEnviromentWeb(request.getParams());
 		} else if (commandStr.equals("getTable")) {
 			response = getTable(request.getParams());
-		} else if (commandStr.equals("clickOnListItemByText")) {
-			response = clickOnListItemByText(request.getParams());
+		} else if (commandStr.equals("getIndexListItemByText")) {
+			response = getIndexListItemByText(request.getParams());
 		}
 		
 		else{
@@ -2076,32 +2077,43 @@ public class SoloExecutor {
 		}
 		return result;
 	}
-	public CommandResponse clickOnListItemByText(String[] params){
+	public CommandResponse getIndexListItemByText(String[] params){
 		CommandResponse result = new CommandResponse();
-		String command = "the command \"getListView\": ";
+		String command = "the command \"clickOnListItemByText\": ";
 		String searchedItemText= params[0]; 
+		int textid= Integer.valueOf(params[1]);
 		for (View view : solo.getCurrentViews()) {
+			Log.d(TAG, "creating batch of  lists views ");
 			if (view instanceof ListView) {
 				ListView listView = (ListView) view;
 				int count = listView.getChildCount();
+				Log.d(TAG, "get childe of lists of views count = " +count);
 				for( int i =0 ; i<count ;i++)
-					{	// assuming that we have only oe list view on the current main activity  
-						String   context= (String) listView.getChildAt(i).getContext().getText(0);
+					{	// assuming that we have only oe list view on the current main activity 
+					Log.d(TAG, "childe index : "+i);
+//					View view2 = ;
+					ViewGroup latout= ((ViewGroup) listView.getChildAt(i));
+					TextView tv=(TextView) latout.findViewById(textid);
+					String   context=tv.getText().toString();
+					
+//						String   context= ((TextView) listView.getChildAt(i)).getText().toString();
+						
 						Log.d(TAG, "context text : " + context.toString());
 						if ( context.contains(searchedItemText)){
+							Log.d(TAG, "context text contains : " + searchedItemText);
 							String[] array = new String[1];
+//							this.solo.clickInList(i);// click on the item in the list 
 							array[0] = String.valueOf(i);
 							result.setReturnedValues(array);
 							result.setResponse(command);
 							result.setSucceeded(true); 
-							this.solo.clickInList(i);// click on the item in the list 
 							return result;
 						}
 					}
 				}
 		}
 		result.setSucceeded(false);
-		result.setResponse("can't fins searched text in view the searched text is :  " + searchedItemText + " in method clickOnListItemByText");
+		result.setResponse("can't find searched text in view the searched text is :  " + searchedItemText + " in method clickOnListItemByText");
 		return result;
 	}
 }
