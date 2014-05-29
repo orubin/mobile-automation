@@ -546,10 +546,11 @@ public class SoloExecutor {
 			response = "waiting for text";
 			if (solo.waitForText(params[0])) {
 				result.setResponse(command + ",Response: " + response + " is visible");
+				result.setSucceeded(true);
 			} else {
 				result.setResponse(command + ",Response: " + response + " is not visible");
+				result.setSucceeded(false);
 			}
-			result.setSucceeded(true);
 		} catch (Throwable e) {
 			result = handleException(command, e);
 		}
@@ -1929,7 +1930,7 @@ public class SoloExecutor {
 		long valueOfCounter = 0;
 		try {
 			SharedPreferences sharedPreferences = solo.getCurrentActivity().getApplicationContext().getSharedPreferences(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
-			sharedPreferences.edit().putBoolean(FIRST_PROMO_INVITE, true).commit();
+			sharedPreferences.edit().putBoolean(FIRST_PROMO_INVITE, false).commit();
 			valueOfCounter = sharedPreferences.getLong(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
 		} catch (Throwable e) {
 			return handleException("Failed: " + response.getOriginalCommand(), e);
