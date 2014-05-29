@@ -735,5 +735,11 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse getIndexListItemByText( String searchedTextInList, int viewId) throws Exception {
 		return sendData("getIndexListItemByText", searchedTextInList, String.valueOf(viewId));
 	}
+
+
+	@Override
+	public CommandResponse initWebElementAndExecuteMethode(String locatorType, String locator, String methodNameStr, String TextToInsert) throws Exception {
+		return sendData("initWebElementAndExecuteMethode",locatorType,  locator,  methodNameStr,  TextToInsert);
+	}
 		
 }
