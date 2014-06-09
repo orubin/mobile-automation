@@ -2139,13 +2139,14 @@ public class SoloExecutor {
 
 	public CommandResponse launchServerEnviroment(String[] params) {
 		CommandResponse response = new CommandResponse();
+		Activity lastActivity;
 		String server = params[0];
 		try {
 			response.setOriginalCommand("set server environment" + server);
 			Intent intent = new Intent("com.gettaxi.android.OPEN_URL");
 			intent.putExtra("DATA", server);
 			// TODO: Assert that the last activity is not null and handle the exeception
-			Activity lastActivity = solo.getActivityMonitor().getLastActivity();
+			lastActivity = solo.getActivityMonitor().getLastActivity();
 			if (lastActivity == null || lastActivity.isFinishing()) {
 				solo.getCurrentActivity();
 				if (lastActivity == null || lastActivity.isFinishing()) {				
@@ -2162,7 +2163,7 @@ public class SoloExecutor {
 		} catch (Throwable e) {
 			return handleException("Failed: " + response.getOriginalCommand(), e);
 		}
-		response.setResponse("set the server enviroment to run with  + value of preferance key  is " + server);
+		response.setResponse("set the server enviroment to run with  + value of preferance key  is " + server +"last activity , the returned value is  : "+ lastActivity);
 		response.setSucceeded(true);
 		return response;
 	}
