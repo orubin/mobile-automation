@@ -634,7 +634,12 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse setPreferanceCompleteRideCounter() throws Exception {
 		return sendData("setPreferanceCompleteRideCounter");
 	}
-
+	
+	@Override
+	public CommandResponse setPreferanceFirstPromoInvite() throws Exception {
+		return sendData("setPreferanceFirstPromoInvite");
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -653,7 +658,7 @@ public class MobileClient implements MobileClientInterface {
     public CommandResponse setPreferanceInUserApp(String SettingFileName,String KeyPreferanceNameToBeChange) throws Exception {
         return sendData("setPreferanceInUserApp",SettingFileName,KeyPreferanceNameToBeChange);
     }
-
+	
 	public CommandResponse isButtonVisible(Attribute attribute, String value) throws Exception {
 		return sendData("isButtonVisible", attribute.name(), value);
 	}
@@ -716,9 +721,13 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse getTable(String language, String requestedValue) throws Exception {
 		return sendData("getTable", language, requestedValue);
 	}
-
-	public CommandResponse takeScreenshot() throws Exception {
-		return sendData("takeScreenshot");
+	@Override
+	public CommandResponse getIndexListItemByText( String searchedTextInList, int viewId) throws Exception {
+		return sendData("getIndexListItemByText", searchedTextInList, String.valueOf(viewId));
 	}
-	
+
+	@Override
+	public CommandResponse initWebElementAndExecuteMethode(String locatorType, String locator, String methodNameStr, String TextToInsert) throws Exception {
+		return sendData("initWebElementAndExecuteMethode",locatorType,  locator,  methodNameStr,  TextToInsert);
+	}	
 }

@@ -3,6 +3,8 @@ package il.co.topq.mobile.server.impl;
 import il.co.topq.mobile.common.datamodel.CommandRequest;
 import il.co.topq.mobile.common.datamodel.CommandResponse;
 import il.co.topq.mobile.common.server.utils.JsonParser;
+import il.co.topq.mobile.server.common.enum_c.ELocatorType;
+import il.co.topq.mobile.server.common.enum_c.SoloWebViewMethod;
 import il.co.topq.mobile.server.impl.SoloUtils.AXIS;
 import il.co.topq.mobile.server.interfaces.ISoloProvider;
 import il.co.topq.mobile.viewexpr.ViewExpressionException;
@@ -20,14 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Application;
 import android.app.Instrumentation;
-import android.app.Instrumentation.ActivityMonitor;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,11 +41,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.SlidingDrawer;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.robotium.solo.By;
 import com.robotium.solo.Solo;
+import com.robotium.solo.WebElement;
 
 /**
  * 
@@ -56,6 +56,7 @@ import com.robotium.solo.Solo;
 public class SoloExecutor {
 
 	private static final String COMPLETE_ORDERS = "COMPLETE_ORDERS";
+	private static final String FIRST_PROMO_INVITE = "FIRST_PROMO_INVITE";
 	private static final String SETTINGS_FILE_NAME = "app_pref.dat";
 	private static final String TAG = "SoloExecutor";
 	private Instrumentation instrumentation;
@@ -309,10 +310,14 @@ public class SoloExecutor {
 			response = deleteAppData();			
 		} else if (commandStr.equals("pull")) {
 			response = pull(request.getParams());
+		} else if (commandStr.equals("initWebElementAndExecuteMethode")) {
+			response = initWebElementAndExecuteMethode(request.getParams());
 		} else if (commandStr.equals("push")) {
 			response = createFileInServer(request.getParams());
 		} else if (commandStr.equals("setPreferanceCompleteRideCounter")) {
 			response = setPreferanceCompleteRideCounter();
+		} else if (commandStr.equals("setPreferanceFirstPromoInvite")) {
+			response = setPreferanceFirstPromoInvite();
 		} else if (commandStr.equals("setPreferanceInUserApp")) {
 			response = setPreferanceInUserApp(request.getParams());
 		} else if (commandStr.equals("launchServerEnviroment")) {
@@ -327,7 +332,10 @@ public class SoloExecutor {
 			response = launchServerEnviromentWeb(request.getParams());
 		} else if (commandStr.equals("getTable")) {
 			response = getTable(request.getParams());
+		} else if (commandStr.equals("getIndexListItemByText")) {
+			response = getIndexListItemByText(request.getParams());
 		}
+		
 		else{
 			Log.e(TAG, "ERROR - Didn't find the method: " + request.getCommand() + request.getParams() + " in this class - SoloExecutor!");
 		}
@@ -539,10 +547,11 @@ public class SoloExecutor {
 			response = "waiting for text";
 			if (solo.waitForText(params[0])) {
 				result.setResponse(command + ",Response: " + response + " is visible");
+				result.setSucceeded(true);
 			} else {
 				result.setResponse(command + ",Response: " + response + " is not visible");
+				result.setSucceeded(false);
 			}
-			result.setSucceeded(true);
 		} catch (Throwable e) {
 			result = handleException(command, e);
 		}
@@ -1586,6 +1595,166 @@ public class SoloExecutor {
 			throw new Exception("clickOnView FAILED view: " + view.getClass().getSimpleName() + " is not shown");
 		}
 	}
+	
+	/**
+	 * clicks on a view
+	 * 
+	 * @param view
+	 *            the view to click
+	 * @throws Exception
+	 */
+	private CommandResponse initWebElementAndExecuteMethode(String[] params) throws Exception {
+		Log.i(TAG, "Robotium: About to perform action on web element by method initElementAndExecuteMethode()");
+		CommandResponse result = new CommandResponse();
+		String command = "the initElementAndExecuteMethode  init and Execute: ";
+		String locatorType ,  locator,   methodNameStr , TextToInsert;
+		try {
+			locatorType	 = params[0];
+			locator 	 = params[1];
+			methodNameStr= params[2];
+			TextToInsert = params[3];
+			boolean returnForEait = initElementAndExecuteMethode(locatorType ,  locator,   methodNameStr , TextToInsert);
+			result.setResponse(command);
+			result.setSucceeded(true);
+			String[] returnVal = new String [1];
+			returnVal[0] =String.valueOf(returnForEait);
+			result.setReturnedValues(returnVal);
+		} catch (Throwable e) {
+			result = handleException(command, e);
+		}
+		return result;
+	}
+	
+	public boolean  initElementAndExecuteMethode(String locatorType , String locator,  String methodNameStr ,String TextToInsert) throws Exception {
+		
+		
+		WebElement element;
+		ELocatorType type = ELocatorType.ID;
+		type.initELocatorType(type, locatorType);
+		boolean dome =false;
+		SoloWebViewMethod methodeName = SoloWebViewMethod.ClickOnWebElement;
+		methodeName.initMethodName(methodeName, methodNameStr);
+//		for (WebElement webElement : solo.getCurrentWebElements()) {
+//			
+//		}
+		switch (methodeName){
+			
+			case ClickOnWebElement:
+				
+			clickOnWebElement(locator, methodNameStr, type);
+			break;
+		case waitForWebElement:
+			
+			   return waitForWebElement(locator, methodNameStr, type);
+		case clearTextInWebElement:
+			clearTextInWebElement(locator, methodNameStr, type);
+			break;
+		case enterTextInWebElement:
+			enterTextInWebElement(locator, methodNameStr, TextToInsert, type);
+			break;
+		default:
+			break;
+				
+				
+		}
+		return dome;
+		
+	}
+
+	private void enterTextInWebElement(String locator, String methodNameStr, String TextToInsert, ELocatorType type) throws Exception {
+		switch (type) {
+		case ID:
+				solo.typeTextInWebElement(By.id(locator),TextToInsert);
+			break;
+		case NAME:
+			solo.enterTextInWebElement(By.name(locator),TextToInsert);
+			break;
+		case CLASS:
+			solo.enterTextInWebElement(By.className(locator),TextToInsert);
+			break;
+		case CSS:
+			solo.enterTextInWebElement(By.cssSelector(locator),TextToInsert);
+			break;
+		case XPATH:
+			solo.typeTextInWebElement(By.xpath(locator),TextToInsert);
+			break;
+		default:
+			Log.e(TAG,"element " + locator +  " in method" + methodNameStr + " wasn't Found");
+			throw new Exception();
+		}
+	}
+
+	private void clearTextInWebElement(String locator, String methodNameStr, ELocatorType type) throws Exception {
+		switch (type) {
+		case ID:
+				solo.clearTextInWebElement(By.id(locator));
+			break;
+		case NAME:
+			solo.clearTextInWebElement(By.name(locator));
+			break;
+		case CLASS:
+			solo.clearTextInWebElement(By.className(locator));
+			break;
+		case CSS:
+			solo.clearTextInWebElement(By.cssSelector(locator));
+			break;
+		case XPATH:
+			solo.clearTextInWebElement(By.xpath(locator));
+			break;
+		default:
+			Log.e(TAG,"element " + locator +  " in method" + methodNameStr + " wasn't Found");
+			throw new Exception();
+		}
+	}
+
+	private boolean  waitForWebElement(String locator, String methodNameStr, ELocatorType type) throws Exception {
+		boolean exist=false;
+		switch (type) {
+		case ID:
+			exist= solo.waitForWebElement(By.id(locator));
+			break;
+		case NAME:
+			exist= solo.waitForWebElement(By.name(locator));
+			break;
+		case CLASS:
+			exist= solo.waitForWebElement(By.className(locator));
+			break;
+		case CSS:
+			exist= solo.waitForWebElement(By.cssSelector(locator));
+			break;
+		case XPATH:
+			exist= solo.waitForWebElement(By.xpath(locator));
+			break;
+		default:
+			Log.e(TAG,"element " + locator +  " in method" + methodNameStr + " wasn't Found");
+			throw new Exception();
+		}
+		return exist;
+	}
+
+	private void clickOnWebElement(String locator, String methodNameStr, ELocatorType type) throws Exception {
+		switch (type) {
+		case ID:
+				solo.clickOnWebElement(By.id(locator));
+			break;
+		case NAME:
+			solo.clickOnWebElement(By.name(locator));
+			break;
+		case CLASS:
+			solo.clickOnWebElement(By.className(locator));
+			break;
+		case CSS:
+			solo.clickOnWebElement(By.cssSelector(locator));
+			break;
+		case XPATH:
+			solo.clickOnWebElement(By.xpath(locator));
+			break;
+		default:
+			Log.e(TAG,"element " + locator +  " in method" + methodNameStr + " wasn't Found");
+			throw new Exception();
+		}
+	}
+
 
 	// *********************** updating methods
 
@@ -1914,6 +2083,23 @@ public class SoloExecutor {
 		response.setSucceeded(true);
 		return response;
 	}
+	private CommandResponse setPreferanceFirstPromoInvite() {
+		// update the compte ride parameter in the preferences to be 0 so we won't get any popup for
+		// rate the App
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("setPreferanceFirstPromoInvite");
+		long valueOfCounter = 0;
+		try {
+			SharedPreferences sharedPreferences = solo.getCurrentActivity().getApplicationContext().getSharedPreferences(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
+			sharedPreferences.edit().putBoolean(FIRST_PROMO_INVITE, false).commit();
+			valueOfCounter = sharedPreferences.getLong(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
+		} catch (Throwable e) {
+			return handleException("Failed: " + response.getOriginalCommand(), e);
+		}
+		response.setResponse("setPreferanceFirstPromoInvite + value of counter is " + String.valueOf(valueOfCounter));
+		response.setSucceeded(true);
+		return response;
+	}
 	
 	private CommandResponse deleteAppData() {
 		CommandResponse response = new CommandResponse();
@@ -2051,6 +2237,45 @@ public class SoloExecutor {
 			result.setSucceeded(false);
 			result.setResponse("View is instance of " + view.getClass().getSimpleName() + " instead of ListView");
 		}
+		return result;
+	}
+	public CommandResponse getIndexListItemByText(String[] params){
+		CommandResponse result = new CommandResponse();
+		String command = "the command \"clickOnListItemByText\": ";
+		String searchedItemText= params[0]; 
+		int textid= Integer.valueOf(params[1]);
+		for (View view : solo.getCurrentViews()) {
+			Log.d(TAG, "creating batch of  lists views ");
+			if (view instanceof ListView) {
+				ListView listView = (ListView) view;
+				int count = listView.getChildCount();
+				Log.d(TAG, "get childe of lists of views count = " +count);
+				for( int i =0 ; i<count ;i++)
+					{	// assuming that we have only oe list view on the current main activity 
+					Log.d(TAG, "childe index : "+i);
+//					View view2 = ;
+					ViewGroup latout= ((ViewGroup) listView.getChildAt(i));
+					TextView tv=(TextView) latout.findViewById(textid);
+					String   context=tv.getText().toString();
+					
+//						String   context= ((TextView) listView.getChildAt(i)).getText().toString();
+						
+						Log.d(TAG, "context text : " + context.toString());
+						if ( context.contains(searchedItemText)){
+							Log.d(TAG, "context text contains : " + searchedItemText);
+							String[] array = new String[1];
+//							this.solo.clickInList(i);// click on the item in the list 
+							array[0] = String.valueOf(i);
+							result.setReturnedValues(array);
+							result.setResponse(command);
+							result.setSucceeded(true); 
+							return result;
+						}
+					}
+				}
+		}
+		result.setSucceeded(false);
+		result.setResponse("can't find searched text in view the searched text is :  " + searchedItemText + " in method clickOnListItemByText");
 		return result;
 	}
 }
