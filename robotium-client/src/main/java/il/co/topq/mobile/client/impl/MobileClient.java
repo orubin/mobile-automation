@@ -741,5 +741,29 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse initWebElementAndExecuteMethode(String locatorType, String locator, String methodNameStr, String TextToInsert) throws Exception {
 		return sendData("initWebElementAndExecuteMethode",locatorType,  locator,  methodNameStr,  TextToInsert);
 	}
+
+
+	@Override
+	public CommandResponse isRadioBtnIscheckedByText(String RBtnText) throws Exception {
+		return sendData("isRadioBtnIscheckedByText", RBtnText);
+	}
+
+
+	@Override
+	public CommandResponse isCheckBoxIscheckedByText(String CheckBtnText) throws Exception {
+		return sendData("isCheckBoxIscheckedByText", CheckBtnText);
+	}
+
+
+	@Override
+	public CommandResponse isCheckBoxIscheckedByIndex(int CheckIndex) throws Exception {
+		return sendData("isCheckBoxIscheckedByIndex", String.valueOf(CheckIndex));
+	}
+
+
+	@Override
+	public CommandResponse isRadioButtoncheckedByIndex(int RBtnIndex) throws Exception {
+		return sendData("isRadioButtoncheckedByIndex", String.valueOf(RBtnIndex));
+	}
 		
 }

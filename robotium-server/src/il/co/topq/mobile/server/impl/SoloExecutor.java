@@ -37,6 +37,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -303,6 +304,14 @@ public class SoloExecutor {
 			response = scrollDown();
 		} else if (commandStr.equals("clickOnRadioButton")) {
 			response = clickOnRadioButton(request.getParams());
+		} else if (commandStr.equals("isRadioBtnIscheckedByText")) {
+			response = isRadioBtnIscheckedByText(request.getParams());
+		} else if (commandStr.equals("isRadioButtoncheckedByIndex")) {
+			response = isRadioButtoncheckedByIndex(request.getParams());
+		} else if (commandStr.equals("isCheckBoxIscheckedByText")) {
+			response = isCheckBoxIscheckedByText(request.getParams());
+		} else if (commandStr.equals("isCheckBoxIscheckedByIndex")) {
+			response = isCheckBoxIscheckedByIndex(request.getParams());
 		} else if (commandStr.equals("clickOnActionBarHomeButton")) {
 			response = clickOnActionBarHomeButton();
 		} else if (commandStr.equals("showMenuOptions")) {
@@ -1961,6 +1970,121 @@ public class SoloExecutor {
 			}
 			response.setSucceeded(true);
 			response.setResponse("Clicked on radio button with index " + radioButtonIndex);
+		} catch (Exception e) {
+			return handleException("Failed to run command " + response.getOriginalCommand(), e);
+		}
+		return response;
+	}
+	
+	/**
+	 * This method will return  on a radioButton status by its index<br>
+	 * 
+	 * @param arguments
+	 * @author livnat 6.14
+	 */
+	private CommandResponse isRadioButtoncheckedByIndex(String[] params) {
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("isRadioButtonchecked");
+		String retParams[] =new String[2];
+		try {
+			int radioButtonIndex = Integer.parseInt(params[0]);
+			Log.i(TAG, "Robotium: About to pull radio btn  checked status in index: " + radioButtonIndex);
+			int counter = 0;
+			for (View v : solo.getCurrentViews()) {
+				if (v instanceof RadioButton) {
+					counter++;
+				}
+			}
+			if (radioButtonIndex <= counter) {
+				retParams[0]= String.valueOf(solo.isRadioButtonChecked(radioButtonIndex));
+				response.setParams(retParams);
+			} else {
+				throw new Exception("Radion button index is invalid, found " + counter + " radio buttons and requested index was: " + radioButtonIndex);
+			}
+			response.setSucceeded(true);
+			response.setResponse("Clicked on radio button with index " + radioButtonIndex);
+		} catch (Exception e) {
+			return handleException("Failed to run command " + response.getOriginalCommand(), e);
+		}
+		return response;
+	}
+	
+	/**
+	 * This method will return  on a radioButton status by its index<br>
+	 * 
+	 * @param arguments
+	 * @author livnat 6.14
+	 */
+	private CommandResponse isRadioBtnIscheckedByText(String[] params) {
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("isRadioBtnIscheckedByText");
+		String retParams[] =new String[1];
+		try {
+			String checkButtonText = params[0];
+			Log.i(TAG, "Robotium: About to pull radioBtn has  checked status in text: " + checkButtonText);
+			
+			retParams[0]= String.valueOf(solo.isRadioButtonChecked(checkButtonText));
+			response.setParams(retParams);
+			
+			response.setSucceeded(true);
+			response.setResponse("validate if radioBtn status is checked for radioBtn  with text " + checkButtonText);
+		} catch (Exception e) {
+			return handleException("Failed to run command " + response.getOriginalCommand(), e);
+		}
+		return response;
+	}
+	
+	/**
+	 * This method will return  on a checkBox status by its index<br>
+	 * 
+	 * @param arguments
+	 * @author livnat 6.14
+	 */
+	private CommandResponse isCheckBoxIscheckedByIndex(String[] params) {
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("isCheckBoxIscheckedByIndex");
+		String retParams[] =new String[1];
+		try {
+			int checkButtonIndex = Integer.parseInt(params[0]);
+			Log.i(TAG, "Robotium: About to pull checkBox has  checked status in index: " + checkButtonIndex);
+			int counter = 0;
+			for (View v : solo.getCurrentViews()) {
+				if (v instanceof CheckBox) {
+					counter++;
+				}
+			}
+			if (checkButtonIndex <= counter) {
+				retParams[0]= String.valueOf(solo.isCheckBoxChecked(checkButtonIndex));
+				response.setParams(retParams);
+			} else {
+				throw new Exception("CheckBox button index is invalid, found " + counter + " Check Box  status requested index was: " + checkButtonIndex);
+			}
+			response.setSucceeded(true);
+			response.setResponse("validate if checkobox status is checked for checkoBox  with index " + checkButtonIndex);
+		} catch (Exception e) {
+			return handleException("Failed to run command " + response.getOriginalCommand(), e);
+		}
+		return response;
+	}
+	/**
+	 * This method will return  on a checkBox status by its Text<br>
+	 * 
+	 * @param arguments
+	 * @author livnat 6.14
+	 */
+	private CommandResponse isCheckBoxIscheckedByText(String[] params) {
+		CommandResponse response = new CommandResponse();
+		response.setOriginalCommand("isCheckBoxIschecked");
+		String retParams[] =new String[1];
+		try {
+			String checkButtonText = params[0];
+			Log.i(TAG, "Robotium: About to pull checkBox has  checked status in text: " + checkButtonText);
+			
+			retParams[0]= String.valueOf(solo.isCheckBoxChecked(checkButtonText));
+			response.setParams(retParams);
+			
+			response.setSucceeded(true);
+			response.setResponse("validate if checkobox status is checked for checkoBox  with text " + checkButtonText);
 		} catch (Exception e) {
 			return handleException("Failed to run command " + response.getOriginalCommand(), e);
 		}
