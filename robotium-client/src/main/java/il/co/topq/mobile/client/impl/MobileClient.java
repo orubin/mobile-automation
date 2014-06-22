@@ -104,7 +104,7 @@ public class MobileClient implements MobileClientInterface {
 		try {
 			String resultStr = null;
 			if ((resultStr = this.tcpClient.sendData(jsonRequest)) == null) {
-				throw new Exception("No data recvied from server! please check server log!");
+				throw new Exception("No data received from server! Please check server log!");
 			}
 			result = JsonParser.fromJson(resultStr, CommandResponse.class);
 		} catch (Exception e) {
@@ -735,7 +735,6 @@ public class MobileClient implements MobileClientInterface {
 	public CommandResponse getIndexListItemByText( String searchedTextInList, int viewId) throws Exception {
 		return sendData("getIndexListItemByText", searchedTextInList, String.valueOf(viewId));
 	}
-
 
 	@Override
 	public CommandResponse initWebElementAndExecuteMethode(String locatorType, String locator, String methodNameStr, String TextToInsert) throws Exception {

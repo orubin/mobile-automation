@@ -177,8 +177,6 @@ public interface MobileClientInterface {
 	 * 
 	 * @throws Exception
 	 */
-	public abstract void closeConnection() throws Exception;
-
 	public abstract CommandResponse getViews() throws Exception;
 
 	public abstract CommandResponse swipeLeft() throws Exception;
@@ -275,4 +273,5 @@ public interface MobileClientInterface {
 	public CommandResponse isCheckBoxIscheckedByText(String CheckBtnText) throws Exception ;
 	public CommandResponse isCheckBoxIscheckedByIndex(int CheckIndex) throws Exception ;
 	public CommandResponse isRadioButtoncheckedByIndex(int RBtn) throws Exception ;
+	void closeConnection() throws Exception;
 }
