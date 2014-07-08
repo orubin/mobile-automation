@@ -177,8 +177,6 @@ public interface MobileClientInterface {
 	 * 
 	 * @throws Exception
 	 */
-	public abstract void closeConnection() throws Exception;
-
 	public abstract CommandResponse getViews() throws Exception;
 
 	public abstract CommandResponse swipeLeft() throws Exception;
@@ -271,4 +269,10 @@ public interface MobileClientInterface {
 	public CommandResponse getIndexListItemByText(String searchedTextInList,int viewId) throws Exception;
 	public CommandResponse setPreferanceFirstPromoInvite() throws Exception;
 	public CommandResponse  initWebElementAndExecuteMethode(String locatorType , String locator,  String methodNameStr ,String TextToInsert)throws Exception;
+	public CommandResponse isRadioBtnIscheckedByText(String RBtnText) throws Exception ;
+	public CommandResponse isCheckBoxIscheckedByText(String CheckBtnText) throws Exception ;
+	public CommandResponse isCheckBoxIscheckedByIndex(int CheckIndex) throws Exception ;
+	public CommandResponse isRadioButtoncheckedByIndex(int RBtn) throws Exception ;
+	public void closeConnection() throws Exception;
+	public CommandResponse getTextById(String id) throws Exception;
 }

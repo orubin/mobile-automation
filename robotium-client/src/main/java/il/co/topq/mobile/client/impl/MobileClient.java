@@ -104,7 +104,7 @@ public class MobileClient implements MobileClientInterface {
 		try {
 			String resultStr = null;
 			if ((resultStr = this.tcpClient.sendData(jsonRequest)) == null) {
-				throw new Exception("No data recvied from server! please check server log!");
+				throw new Exception("No data received from server! Please check server log!");
 			}
 			result = JsonParser.fromJson(resultStr, CommandResponse.class);
 		} catch (Exception e) {
@@ -163,6 +163,16 @@ public class MobileClient implements MobileClientInterface {
 	@Override
 	public CommandResponse getText(int index) throws Exception {
 		return sendData("getText", Integer.toString(index));
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see il.co.topq.mobile.client.impl.Delme#getText(int)
+	 */
+	@Override
+	public CommandResponse getTextById(String id) throws Exception {
+		return sendData("getTextById", id);
 	}
 
 	/*
@@ -736,10 +746,33 @@ public class MobileClient implements MobileClientInterface {
 		return sendData("getIndexListItemByText", searchedTextInList, String.valueOf(viewId));
 	}
 
-
 	@Override
 	public CommandResponse initWebElementAndExecuteMethode(String locatorType, String locator, String methodNameStr, String TextToInsert) throws Exception {
 		return sendData("initWebElementAndExecuteMethode",locatorType,  locator,  methodNameStr,  TextToInsert);
+	}
+
+
+	@Override
+	public CommandResponse isRadioBtnIscheckedByText(String RBtnText) throws Exception {
+		return sendData("isRadioBtnIscheckedByText", RBtnText);
+	}
+
+
+	@Override
+	public CommandResponse isCheckBoxIscheckedByText(String CheckBtnText) throws Exception {
+		return sendData("isCheckBoxIscheckedByText", CheckBtnText);
+	}
+
+
+	@Override
+	public CommandResponse isCheckBoxIscheckedByIndex(int CheckIndex) throws Exception {
+		return sendData("isCheckBoxIscheckedByIndex", String.valueOf(CheckIndex));
+	}
+
+
+	@Override
+	public CommandResponse isRadioButtoncheckedByIndex(int RBtnIndex) throws Exception {
+		return sendData("isRadioButtoncheckedByIndex", String.valueOf(RBtnIndex));
 	}
 		
 }

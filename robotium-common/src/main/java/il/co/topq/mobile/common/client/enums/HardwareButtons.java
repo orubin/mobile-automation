@@ -7,6 +7,6 @@ package il.co.topq.mobile.common.client.enums;
  */
 public enum HardwareButtons {
 	
-	HOME,BACK;
+	HOME,BACK,ENTER,TAB;
 
 }
