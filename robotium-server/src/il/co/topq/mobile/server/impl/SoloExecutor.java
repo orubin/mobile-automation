@@ -264,6 +264,8 @@ public class SoloExecutor {
 			response = getViews(request.getParams());
 		} else if (commandStr.equals("getText")) {
 			response = getText(request.getParams());
+		} else if (commandStr.equals("getTextById")) {
+			response = getTextById(request.getParams());
 		} else if (commandStr.equals("getTextViewIndex")) {
 			response = getTextViewIndex(request.getParams());
 		} else if (commandStr.equals("getTextView")) {
@@ -843,6 +845,32 @@ public class SoloExecutor {
 		}
 		return result;
 	}
+	
+	/**
+	 * gets the text by id
+	 * 
+	 * @param arguments
+	 *            index
+	 * @return response with the status of the command
+	 */
+	private CommandResponse getTextById(String[] arguments) {
+		String command = "the command  getTextById";
+		CommandResponse result = new CommandResponse();
+		String response = "";
+		try {
+			command += "(" + arguments[0] + ")";
+			TextView view = (TextView) solo.getView(arguments[0]);
+			response = view.getText().toString();
+			result.setOriginalCommand(command + ",Response: " + response);
+			result.setResponse(response);
+			result.setSucceeded(true);
+		} catch (Throwable e) {
+			result = handleException(command, e);
+		}
+		return result;
+	}
+	
+	
 
 	private CommandResponse getViews(String[] arguments) {
 		String command = "the command  getViews";
