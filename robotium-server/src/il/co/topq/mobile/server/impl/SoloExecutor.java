@@ -869,8 +869,21 @@ public class SoloExecutor {
 		String response = "";
 		try {
 			command += "(" + arguments[0] + ")";
-			TextView view = (TextView) solo.getView(arguments[0]);
-			response = view.getText().toString();
+			ArrayList<View> views = solo.getViews();
+			for (View view : views) {
+//					Log.i(TAG, Integer.toString(view.getId()));
+//					try {
+//						TextView v = (TextView) view;
+//						Log.i(TAG, v.getText().toString());
+//					} catch (Exception e) {
+//						// TODO: handle exception
+//					}
+				if(view.getId() == Integer.parseInt(arguments[0])){
+					TextView v = (TextView) view;
+					response = v.getText().toString();
+				}
+			}
+			//response = v.getText().toString();
 			result.setOriginalCommand(command + ",Response: " + response);
 			result.setResponse(response);
 			result.setSucceeded(true);
