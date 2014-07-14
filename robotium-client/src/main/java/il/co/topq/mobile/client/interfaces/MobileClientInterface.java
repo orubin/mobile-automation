@@ -274,5 +274,6 @@ public interface MobileClientInterface {
 	public CommandResponse isCheckBoxIscheckedByIndex(int CheckIndex) throws Exception ;
 	public CommandResponse isRadioButtoncheckedByIndex(int RBtn) throws Exception ;
 	public void closeConnection() throws Exception;
-	public CommandResponse getTextById(String id) throws Exception;
+	public CommandResponse getTextById(int id) throws Exception;
+	public CommandResponse validateIfTextIsFound(String textToSearch) throws Exception;
 }
